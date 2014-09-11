@@ -26,8 +26,8 @@ public class ElevationServiceImpl {
     }
 
     public String getAltitude(double eastings, double northings) {
-        // TODO: add functionality
-        throw new UnsupportedOperationException("Please add this functionality");
+        return getAltitude(String.valueOf(Math.round(eastings)),
+                String.valueOf(Math.round(northings)));
     }
 
     /**
@@ -40,7 +40,6 @@ public class ElevationServiceImpl {
     }
 
     public String getAltitude(String easting, String northing) {
-        // TODO: validate easting and northing values
         return mCacheManager.getAltitude(easting, northing);
     }
 
@@ -310,7 +309,7 @@ public class ElevationServiceImpl {
 
         private static Point parseGridReference(String gridRefIn) {
             Pattern pattern = Pattern.compile("^(\\w\\w)(\\d{0,10})$");
-            Matcher matcher = pattern.matcher(gridRefIn.toUpperCase());
+            Matcher matcher = pattern.matcher(gridRefIn.toUpperCase().replace(" ",""));
             int iIndex = 7;
 
             boolean probableGridReference = matcher.matches();
