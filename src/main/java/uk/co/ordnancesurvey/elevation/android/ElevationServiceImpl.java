@@ -1,33 +1,30 @@
-package uk.co.ordnancesurvey.elevation;
+package uk.co.ordnancesurvey.elevation.android;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
-public class ElevationServiceAppEngineImpl implements ElevationService {
+import uk.co.ordnancesurvey.elevation.ElevationService;
 
-    private static final Logger sLogger = Logger.getLogger(ElevationServiceAppEngineImpl.class.getName());
+public class ElevationServiceImpl implements ElevationService {
+
     private final CacheManager mCacheManager = new CacheManager();
+    private final File mCacheDirectory;
 
-    public ElevationServiceAppEngineImpl() {
+    public ElevationServiceImpl() {
+        mCacheDirectory = new File(System.getProperty("java.io.tmpdir"));
     }
 
     public String getElevation(double eastings, double northings) {
@@ -56,7 +53,7 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
 
         private static final int MAX_CACHE_SIZE = 100;
         Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
-        AltitudeProvider mFileManager = new ZipFileCache();
+        AltitudeProvider mFileManager = new FileManager();
 
         public String getAltitude(String easting, String northing) {
             String key = easting + northing;
@@ -65,32 +62,36 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
             }
             return mFileManager.getAltitude(easting, northing);
         }
+
+        public class MaxSizeHashMap<K, V> extends LinkedHashMap<K, V> {
+            private final int mMaxSize;
+
+            public MaxSizeHashMap(int maxSize) {
+                mMaxSize = maxSize;
+            }
+
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+                return size() > mMaxSize;
+            }
+        }
     }
 
-    private class ZipFileCache implements AltitudeProvider {
+    private class FileManager implements AltitudeProvider {
 
-        NetworkManager mNetworkManager = new NetworkManager();
-        private static final int MAX_CACHE_SIZE = 100;
-        private Map<String, byte[]> mZipFileCache = new MaxSizeHashMap<String, byte[]>(MAX_CACHE_SIZE);
+        NetworkManager mNetworkManager = new NetworkManager(mCacheDirectory);
 
         @Override
         public String getAltitude(String easting, String northing) {
+            // TODO: validate easting and northing values
+            String filePath = getFilename(easting, northing);
             try {
-                // TODO: validate easting and northing values
-                String filename = getFilename(easting, northing);
-
-                byte[] zippedData = mZipFileCache.get(filename);
-
-                if (zippedData == null) {
-                    File file = new File(filename);
-                    zippedData = mNetworkManager.download(file);
-                    mZipFileCache.put(filename, zippedData);
+                File file = new File(filePath);
+                if (!file.exists()) {
+                    mNetworkManager.download(file);
                 }
-
-                String asciiGrid = EsriAsciiGrid.getAsciiGrid(zippedData);
-                return EsriAsciiGrid.getValue(easting, northing, asciiGrid);
+                return EsriAsciiGrid.getValue(easting, northing, file);
             } catch (IOException e) {
-                sLogger.log(Level.WARNING, "issues getting zipped elevation data", e);
                 e.printStackTrace();
             }
             return String.valueOf(Float.MIN_VALUE);
@@ -103,7 +104,7 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
             String x = gridRef.substring(2, 3);
             String y = gridRef.substring(3, 4);
             String name = characters + x + y +  "_OST50GRID_20130611";
-            return name + ".zip";
+            return mCacheDirectory + File.separator + name + ".zip";
         }
     }
 
@@ -112,29 +113,33 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
         private static final String ENDPOINT =
                 "https://github.com/snodnipper/terrain50-java/raw/master/data/";
 
+        private final File mTempDirectory;
+
+        public NetworkManager(File downloadFile) {
+            mTempDirectory = downloadFile;
+        }
+
         /**
          * Uses the first two characters as a subdirectory - very impl
          */
-        public static byte[] download(File file) throws IOException {
+        public static void download(File file) throws IOException {
             String url = ENDPOINT + file.getName().substring(0, 2) + "/" + file.getName();
-            return download2(url);
+            download2(file, url);
         }
 
-        private static byte[] download2(final String urlString)
+        private static void download2(final File file, final String urlString)
                 throws IOException {
-            byte[] result;
             BufferedInputStream in = null;
-            ByteArrayOutputStream fout = null;
+            FileOutputStream fout = null;
             try {
                 in = new BufferedInputStream(new URL(urlString).openStream());
-                fout = new ByteArrayOutputStream();
+                fout = new FileOutputStream(file);
 
                 final byte[] data = new byte[1024];
                 int count;
                 while ((count = in.read(data, 0, 1024)) != -1) {
                     fout.write(data, 0, count);
                 }
-                result = fout.toByteArray();
             } finally {
                 if (in != null) {
                     in.close();
@@ -143,12 +148,10 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
                     fout.close();
                 }
             }
-            return result;
         }
     }
 
     /**
-     * Consider renaming DataAdapter or something
      * See: https://en.wikipedia.org/wiki/Esri_grid
      */
     private static class EsriAsciiGrid {
@@ -176,65 +179,6 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
 
             String word = words[wordNumber];
             return word;
-        }
-
-        private static String getAsciiGrid(final byte[] input) throws IOException {
-
-            System.out.println("Size: " + input.length + " bytes.");
-
-            String result = "empty";
-            ByteArrayInputStream bis = new ByteArrayInputStream(input);
-
-            ZipInputStream stream = new ZipInputStream(bis);
-
-            // create a buffer to improve copy performance later.
-            byte[] buffer = new byte[2048];
-
-            try {
-
-                // now iterate through each item in the stream. The get next
-                // entry call will return a ZipEntry for each file in the
-                // stream
-                ZipEntry entry;
-                while ((entry = stream.getNextEntry()) != null) {
-                    ///
-                    String filename = entry.getName();
-                    Pattern pattern = Pattern.compile(".*[.]asc$");
-                    Matcher matcher = pattern.matcher(filename);
-                    if (!matcher.find()) {
-                        System.out.println("Ignoring: " + filename);
-                        continue;
-                    }
-                    ///
-
-                    String s = String.format("Entry: %s len %d added %TD",
-                            entry.getName(), entry.getSize(),
-                            new Date(entry.getTime()));
-                    System.out.println(s);
-
-                    // Once we get the entry from the stream, the stream is
-                    // positioned read to read the raw data, and we keep
-                    // reading until read returns 0 or less.
-                    ByteArrayOutputStream output = null;
-                    try {
-                        output = new ByteArrayOutputStream();
-                        int len = 0;
-                        while ((len = stream.read(buffer)) > 0) {
-                            output.write(buffer, 0, len);
-                        }
-                        result = output.toString();
-                        break;
-                    } finally {
-                        // we must always close the output file
-                        if (output != null) output.close();
-                    }
-                }
-            } finally {
-                // we must always close the zip file.
-                stream.close();
-            }
-            System.out.println("ASCII size: " + result.getBytes().length + " bytes");
-            return result;
         }
 
         /**
@@ -450,19 +394,6 @@ public class ElevationServiceAppEngineImpl implements ElevationService {
 
         public double getY() {
             return mY;
-        }
-    }
-
-    public class MaxSizeHashMap<K, V> extends LinkedHashMap<K, V> {
-        private final int mMaxSize;
-
-        public MaxSizeHashMap(int maxSize) {
-            mMaxSize = maxSize;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-            return size() > mMaxSize;
         }
     }
 }

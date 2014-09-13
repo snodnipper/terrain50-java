@@ -10,11 +10,11 @@ import com.google.gson.GsonBuilder;
 import javax.servlet.http.*;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.ElevationServiceAppEngineImpl;
+import uk.co.ordnancesurvey.elevation.appengine.ElevationServiceImpl;
 
 public class ElevationServlet extends HttpServlet {
 
-    private static ElevationService sElevationService = new ElevationServiceAppEngineImpl();
+    private static ElevationService sElevationService = new ElevationServiceImpl();
     private static Gson mGson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void main(String args[]) {
