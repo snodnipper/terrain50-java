@@ -62,12 +62,15 @@ class ZipFileCache implements ElevationProvider {
 
     private void restoreCache() {
         MemcacheService mMemcacheService = MemcacheServiceFactory.getMemcacheService();
-        if (mMemcacheService.get(MemCache.KEY_CACHE_MANAGER) != null) {
+        if (mMemcacheService.get(MemCache.KEY_ZIP_FILE) != null) {
             try {
                 mZipFileCache = (Map<String, byte[]>) mMemcacheService.get(MemCache.KEY_ZIP_FILE);
             } catch (ClassCastException exc) {
                 sLogger.log(Level.WARNING, "Error restoring object from memcache", exc);
             }
+        } else {
+            sLogger.log(Level.INFO, "Creating fresh zip file cache");
+            mMemcacheService.put(MemCache.KEY_ZIP_FILE, mZipFileCache);
         }
     }
 }

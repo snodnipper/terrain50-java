@@ -25,10 +25,13 @@ class CacheManager implements ElevationProvider {
 
     public String getElevation(String easting, String northing) {
         String key = easting + northing;
-        if (mMap.containsKey(key)) {
-            return mMap.get(key);
+
+        String elevation = mMap.get(key);
+        if (elevation == null) {
+            elevation = mFileManager.getElevation(easting, northing);
+            mMap.put(key, elevation);
         }
-        return mFileManager.getElevation(easting, northing);
+        return elevation;
     }
 
     private void restoreCache() {
@@ -39,6 +42,9 @@ class CacheManager implements ElevationProvider {
             } catch (ClassCastException exc) {
                 sLogger.log(Level.WARNING, "Error restoring object from memcache", exc);
             }
+        } else {
+            sLogger.log(Level.INFO, "Creating fresh cache manager cache");
+            mMemcacheService.put(MemCache.KEY_CACHE_MANAGER, mMap);
         }
     }
 }
