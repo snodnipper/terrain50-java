@@ -1,31 +1,32 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.appengine:gradle-appengine-plugin:1.9.10'
+    }
+}
+
+repositories {
+    mavenCentral();
+}
+
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'application'
+apply plugin: 'war'
+apply plugin: 'appengine'
 
-mainClassName = 'hello.HelloTerrain50'
-
-// tag::repositories[]
-repositories { 
-    mavenLocal()
-    mavenCentral() 
+dependencies {
+    appengineSdk 'com.google.appengine:appengine-java-sdk:1.9.10'
+    compile 'com.google.jimfs:jimfs:1.0'
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
+    compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
 }
-// end::repositories[]
 
-// tag::jar[]
-jar {
-    baseName = 'gs-gradle'
-    version =  '0.1.0'
+appengine {
+    downloadSdk = true
+    appcfg {
+        oauth2 = true
+    }
 }
-// end::jar[]
-
-// tag::dependencies[]
-//dependencies {
-//    compile "joda-time:joda-time:2.2"
-//}
-// end::dependencies[]
-
-// tag::wrapper[]
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
-}
-// end::wrapper[]
