@@ -34,6 +34,10 @@ public class EsriAsciiGrid {
 
     public static String getValue(String easting, String northing, String asciiGrid) {
 
+        if (asciiGrid == null || asciiGrid.isEmpty()) {
+            return "";
+        }
+
         int myLineNumber  =
                 (Integer.parseInt(northing.substring(Math.max(0, northing.length() - 4),
                         northing.length())) / 50);
@@ -55,7 +59,7 @@ public class EsriAsciiGrid {
 
         sLogger.log(Level.INFO, "Size: " + input.length + " bytes.");
 
-        String result = "empty";
+        String result = "";
         ByteArrayInputStream bis = new ByteArrayInputStream(input);
 
         ZipInputStream stream = new ZipInputStream(bis);
