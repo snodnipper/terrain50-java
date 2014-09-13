@@ -5,6 +5,12 @@
     <version>1</version>
     <threadsafe>true</threadsafe>
 
+    <!-- keep costs down -->
+    <automatic-scaling>
+        <max-idle-instances>1</max-idle-instances>
+        <min-pending-latency>15.0s</min-pending-latency>
+    </automatic-scaling>
+
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
     </system-properties>
