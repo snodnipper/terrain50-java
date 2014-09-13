@@ -9,14 +9,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import uk.co.ordnancesurvey.elevation.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.ElevationService;
+import uk.co.ordnancesurvey.elevation.MaxSizeHashMap;
 
 public class ElevationServiceImpl implements ElevationService {
 
@@ -42,47 +43,30 @@ public class ElevationServiceImpl implements ElevationService {
     }
 
     public String getElevation(String easting, String northing) {
-        return mCacheManager.getAltitude(easting, northing);
+        return mCacheManager.getElevation(easting, northing);
     }
 
-    private interface AltitudeProvider {
-        String getAltitude(String easting, String northing);
-    }
-
-    private class CacheManager implements AltitudeProvider {
+    private class CacheManager implements ElevationProvider {
 
         private static final int MAX_CACHE_SIZE = 100;
         Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
-        AltitudeProvider mFileManager = new FileManager();
+        ElevationProvider mFileManager = new FileManager();
 
-        public String getAltitude(String easting, String northing) {
+        public String getElevation(String easting, String northing) {
             String key = easting + northing;
             if (mMap.containsKey(key)) {
                 return mMap.get(key);
             }
-            return mFileManager.getAltitude(easting, northing);
-        }
-
-        public class MaxSizeHashMap<K, V> extends LinkedHashMap<K, V> {
-            private final int mMaxSize;
-
-            public MaxSizeHashMap(int maxSize) {
-                mMaxSize = maxSize;
-            }
-
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-                return size() > mMaxSize;
-            }
+            return mFileManager.getElevation(easting, northing);
         }
     }
 
-    private class FileManager implements AltitudeProvider {
+    private class FileManager implements ElevationProvider {
 
         NetworkManager mNetworkManager = new NetworkManager(mCacheDirectory);
 
         @Override
-        public String getAltitude(String easting, String northing) {
+        public String getElevation(String easting, String northing) {
             // TODO: validate easting and northing values
             String filePath = getFilename(easting, northing);
             try {
