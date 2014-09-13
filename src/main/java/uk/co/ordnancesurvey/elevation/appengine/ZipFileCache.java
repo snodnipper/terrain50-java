@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 
 import uk.co.ordnancesurvey.elevation.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.MaxSizeHashMap;
-import uk.co.ordnancesurvey.elevation.appengine.gis.BngTools;
-import uk.co.ordnancesurvey.elevation.appengine.gis.EsriAsciiGrid;
+import uk.co.ordnancesurvey.gis.BngTools;
+import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
 
 class ZipFileCache implements ElevationProvider {
 

@@ -1,8 +1,8 @@
 package uk.co.ordnancesurvey.elevation.appengine;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.appengine.gis.BngTools;
-import uk.co.ordnancesurvey.elevation.appengine.gis.Point;
+import uk.co.ordnancesurvey.gis.BngTools;
+import uk.co.ordnancesurvey.gis.Point;
 
 public class ElevationServiceImpl implements ElevationService {
 

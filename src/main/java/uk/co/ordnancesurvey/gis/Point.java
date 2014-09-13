@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.appengine.gis;
+package uk.co.ordnancesurvey.gis;
 
 public class Point {
 

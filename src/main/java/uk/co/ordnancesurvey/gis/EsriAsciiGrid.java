@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.appengine.gis;
+package uk.co.ordnancesurvey.gis;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -27,7 +27,7 @@ public class EsriAsciiGrid {
 
     private static final int HEADER = 5;
 
-    private static String getValue(String easting, String northing,
+    public static String getValue(String easting, String northing,
                                    File zippedAsciiGrid) throws IOException {
         return getValue(easting, northing, getAsciiGrid(zippedAsciiGrid));
     }
