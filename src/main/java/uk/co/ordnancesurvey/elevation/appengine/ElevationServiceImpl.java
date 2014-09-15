@@ -25,7 +25,45 @@ public class ElevationServiceImpl implements ElevationService {
         return getElevation(point.getX(), point.getY());
     }
 
-    public String getElevation(String easting, String northing) {
-        return mCacheManager.getElevation(easting, northing);
+    public String getElevation(final String easting, final String northing) {
+        String eastingToUse = getCorrectedValue(easting);
+        String northingToUse = getCorrectedValue(northing);
+        if (eastingToUse == null || northingToUse == null) {
+            return "";
+        }
+        return mCacheManager.getElevation(eastingToUse, northingToUse);
+    }
+
+    /**
+     * no interpolation so we are rounding down to an integer value
+     */
+    private String getCorrectedValue(String number) {
+        Long result = null;
+        if (isInteger(number)) {
+            result = Long.parseLong(number);
+        } else if (isDouble(number)) {
+            result = Math.round(Double.parseDouble(number));
+        }
+        return result == null ? null : String.valueOf(result);
+    }
+
+    private static boolean isDouble(String s) {
+        try {
+            Double.parseDouble(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        // only got here if we didn't return false
+        return true;
+    }
+
+    private static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+        } catch(NumberFormatException e) {
+            return false;
+        }
+        // only got here if we didn't return false
+        return true;
     }
 }
