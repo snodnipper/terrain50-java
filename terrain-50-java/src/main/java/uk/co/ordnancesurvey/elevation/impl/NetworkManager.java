@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.android;
+package uk.co.ordnancesurvey.elevation.impl;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.net.URL;
 
 class NetworkManager {
 
+    // TODO: update to Ordnance Survey endpoint before release
     private static final String ENDPOINT =
             "https://github.com/snodnipper/terrain50-java/raw/master/data/";
 

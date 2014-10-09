@@ -1,9 +1,8 @@
-package uk.co.ordnancesurvey.elevation.android;
+package uk.co.ordnancesurvey.elevation.impl;
 
 import java.util.Map;
 
 import uk.co.ordnancesurvey.elevation.ElevationProvider;
-import uk.co.ordnancesurvey.elevation.MaxSizeHashMap;
 
 class CacheManager {
     private static final int MAX_CACHE_SIZE = 100;

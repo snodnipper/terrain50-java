@@ -1,7 +1,7 @@
 package hello;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.android.ElevationServiceImpl;
+import uk.co.ordnancesurvey.elevation.impl.ElevationServiceImpl;
 
 public class HelloTerrain50 {
     public static void main(String[] args) {

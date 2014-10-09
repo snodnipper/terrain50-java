@@ -1,23 +1,18 @@
-package uk.co.ordnancesurvey.elevation.android;
+package uk.co.ordnancesurvey.elevation.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import uk.co.ordnancesurvey.elevation.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.MaxSizeHashMap;
 import uk.co.ordnancesurvey.gis.BngTools;
 import uk.co.ordnancesurvey.gis.Point;
 
