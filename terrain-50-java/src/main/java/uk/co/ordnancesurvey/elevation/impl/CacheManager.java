@@ -10,10 +10,10 @@ class CacheManager {
     ElevationProvider mFileManager = new FileManager();
 
     public String getElevation(String easting, String northing) {
-        String key = easting + northing;
-        if (mMap.containsKey(key)) {
-            return mMap.get(key);
+        String key = easting + ":" + northing;
+        if (!mMap.containsKey(key)) {
+            mMap.put(key, mFileManager.getElevation(easting, northing));
         }
-        return mFileManager.getElevation(easting, northing);
+        return mMap.get(key);
     }
 }
