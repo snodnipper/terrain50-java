@@ -16,7 +16,7 @@ class CacheManager implements ElevationProvider {
 
     private static final Logger sLogger = Logger.getLogger(ZipFileCache.class.getName());
 
-    ElevationProvider mFileManager = new ZipFileCache();
+    ElevationProvider mZipFileCache = new ZipFileCache();
     Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
 
     public CacheManager() {
@@ -28,7 +28,7 @@ class CacheManager implements ElevationProvider {
 
         String elevation = mMap.get(key);
         if (elevation == null) {
-            elevation = mFileManager.getElevation(easting, northing);
+            elevation = mZipFileCache.getElevation(easting, northing);
             mMap.put(key, elevation);
         }
         return elevation;
