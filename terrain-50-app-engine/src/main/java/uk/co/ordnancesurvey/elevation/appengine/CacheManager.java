@@ -24,7 +24,7 @@ class CacheManager implements ElevationProvider {
     }
 
     public String getElevation(String easting, String northing) {
-        String key = easting + northing;
+        String key = easting + ":" + northing;
 
         String elevation = mMap.get(key);
         if (elevation == null) {
