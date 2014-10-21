@@ -1,8 +1,8 @@
-package uk.co.ordnancesurvey.elevation.impl;
+package uk.co.ordnancesurvey.elevation.impl.appengine;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
@@ -11,33 +11,29 @@ class NetworkManager {
     private static final String ENDPOINT =
             "https://github.com/snodnipper/terrain50-java/raw/master/data/";
 
-    private final File mTempDirectory;
-
-    public NetworkManager(File downloadFile) {
-        mTempDirectory = downloadFile;
-    }
-
     /**
-     * Uses the first two characters as a subdirectory - very impl
+     * Uses the first two characters as a subdirectory - very internals
      */
-    public static void download(File file) throws IOException {
+    public static byte[] download(File file) throws IOException {
         String url = ENDPOINT + file.getName().substring(0, 2) + "/" + file.getName();
-        download2(file, url);
+        return download2(url);
     }
 
-    private static void download2(final File file, final String urlString)
+    private static byte[] download2(final String urlString)
             throws IOException {
+        byte[] result;
         BufferedInputStream in = null;
-        FileOutputStream fout = null;
+        ByteArrayOutputStream fout = null;
         try {
             in = new BufferedInputStream(new URL(urlString).openStream());
-            fout = new FileOutputStream(file);
+            fout = new ByteArrayOutputStream();
 
             final byte[] data = new byte[1024];
             int count;
             while ((count = in.read(data, 0, 1024)) != -1) {
                 fout.write(data, 0, count);
             }
+            result = fout.toByteArray();
         } finally {
             if (in != null) {
                 in.close();
@@ -46,5 +42,6 @@ class NetworkManager {
                 fout.close();
             }
         }
+        return result;
     }
 }

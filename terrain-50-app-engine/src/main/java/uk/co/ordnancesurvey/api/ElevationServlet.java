@@ -10,7 +10,7 @@ import com.google.gson.GsonBuilder;
 import javax.servlet.http.*;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.appengine.ElevationServiceImpl;
+import uk.co.ordnancesurvey.elevation.impl.appengine.ElevationServiceImpl;
 
 public class ElevationServlet extends HttpServlet {
 

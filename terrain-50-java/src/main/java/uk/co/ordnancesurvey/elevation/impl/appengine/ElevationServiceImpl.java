@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.appengine;
+package uk.co.ordnancesurvey.elevation.impl.appengine;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.gis.BngTools;

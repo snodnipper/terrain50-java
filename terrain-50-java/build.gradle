@@ -22,9 +22,12 @@ jar {
 // end::jar[]
 
 // tag::dependencies[]
-//dependencies {
-//    compile "joda-time:joda-time:2.2"
-//}
+dependencies {
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
+    compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
+}
 // end::dependencies[]
 
 // tag::wrapper[]

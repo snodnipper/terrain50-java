@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.appengine;
+package uk.co.ordnancesurvey.elevation.impl.appengine;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
