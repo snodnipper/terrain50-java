@@ -1,8 +1,11 @@
+apply plugin: 'maven'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
 mainClassName = 'hello.HelloTerrain50'
+version =  '0.1.0'
+group = 'uk.co.ordnancesurvey.apis'
 
 // tag::repositories[]
 repositories {
@@ -29,3 +32,27 @@ task wrapper(type: Wrapper) {
     gradleVersion = '1.11'
 }
 // end::wrapper[]
+
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2014'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+        }
+    }.writeTo("$buildDir/newpom.xml")
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            mavenLocal()
+            // repository(url: "file://localhost/tmp/myRepo/")
+        }
+    }
+}
