@@ -7,15 +7,25 @@ package uk.co.ordnancesurvey.elevation;
 public interface ElevationService {
 
     /**
+     * String input values specified as decimal degrees
+     */
+    String getElevation(String latitude, String longitude);
+
+    /**
+     * input values specified as decimal degrees
+     */
+    String getElevation(double latitude, double longitude);
+
+    /**
      * e.g. 591235 196785
      */
-    String getElevation(double eastings, double northings);
+    String getElevationFromBng(double eastings, double northings);
 
     /**
      * @param gridReference e.g. TQ 9123 9678
      * @return a String value of the altitude
      */
-    String getElevation(String gridReference);
+    String getElevationFromBng(String gridReference);
 
-    String getElevation(String easting, String northing);
+    String getElevationFromBng(String easting, String northing);
 }

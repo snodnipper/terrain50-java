@@ -35,7 +35,16 @@ public class ElevationServlet extends HttpServlet {
                 && req.getParameterMap().containsKey("northing")) {
             String easting = req.getParameter("easting");
             String northing = req.getParameter("northing");
-            String elevation = sElevationService.getElevation(easting, northing);
+            String elevation = sElevationService.getElevationFromBng(easting, northing);
+
+            String json = JsonDataV1.export(elevation);
+            resp.setContentType("application/json");
+            resp.getWriter().println(json);
+        } else if (req.getParameterMap().containsKey("latitude")
+                && req.getParameterMap().containsKey("longitude")) {
+            String latitude = req.getParameter("latitude");
+            String longitude = req.getParameter("longitude");
+            String elevation = sElevationService.getElevation(latitude, longitude);
 
             String json = JsonDataV1.export(elevation);
             resp.setContentType("application/json");
