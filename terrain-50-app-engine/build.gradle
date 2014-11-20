@@ -26,7 +26,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
-    compile 'uk.co.ordnancesurvey.apis:gs-gradle:0.1.0'
+    compile 'uk.co.ordnancesurvey.api:elevation:0.1.0'
 }
 
 appengine {

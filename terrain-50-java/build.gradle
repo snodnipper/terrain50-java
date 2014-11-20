@@ -5,7 +5,7 @@ apply plugin: 'application'
 
 mainClassName = 'hello.HelloTerrain50'
 version =  '0.1.0'
-group = 'uk.co.ordnancesurvey.apis'
+group = 'uk.co.ordnancesurvey.api'
 
 // tag::repositories[]
 repositories {
@@ -16,7 +16,7 @@ repositories {
 
 // tag::jar[]
 jar {
-    baseName = 'gs-gradle'
+    baseName = 'elevation'
     version =  '0.1.0'
 }
 // end::jar[]
@@ -51,11 +51,20 @@ task writeNewPom << {
     }.writeTo("$buildDir/newpom.xml")
 }
 
+/**
+ * Note: to upload the archive the developer must specify the username and password in their gradle
+ * properties file:
+ *    ~/.gradle/gradle.properties
+ *       mavenUser=admin
+ *       mavenPassword=myAdminPassword
+ */
 uploadArchives {
     repositories {
         mavenDeployer {
             mavenLocal()
-            // repository(url: "file://localhost/tmp/myRepo/")
+            repository(url: "http://lv515:8081/nexus/content/repositories/releases") {
+                authentication(userName: mavenUser, password: mavenPassword)
+            }
         }
     }
 }
