@@ -59,14 +59,60 @@ task writeNewPom << {
  *    ~/.gradle/gradle.properties
  *       mavenUser=admin
  *       mavenPassword=myAdminPassword
+ *
+ * Alternative: it is possible to pass in a property to the build like the following.
+ *
+ *    ./gradle uploadArchives -PsonatypeUsername=MysticalDeployer -PsonatypePassword=password1
+ *
+ *    authentication(userName: project.hasProperty("sonatypeUsername") ?
+ *              project.sonatypeUsername : null, password: project.hasProperty("sonatypePassword") ?
+ *              project.sonatypePassword : null)
+ *
  */
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            mavenLocal()
-            // repository(url: "http://lv515:8081/nexus/content/repositories/releases") {
-            repository(url: "http://lv515:8081/nexus/content/repositories/snapshots") {
-                authentication(userName: mavenUser, password: mavenPassword)
+
+    repositories.mavenDeployer {
+        /* TODO:
+        beforeDeployment { MavenDeployment deployment ->
+            signing.signPom(deployment)
+        }*/
+
+        repository (url: "http://lv515:8081/nexus/content/repositories/releases") {
+            authentication (userName: mavenUser, password: mavenPassword)
+        }
+        snapshotRepository (url: "http://lv515:8081/nexus/content/repositories/snapshots") {
+            authentication (userName: mavenUser, password: mavenPassword)
+        }
+
+        pom.project {
+            name 'OS Java Elevation API'
+            packaging 'jar'
+            description 'Simple API to access datasets such as terrain 50'
+            delegate.url 'http://www.ordnancesurvey.co.uk/business-and-government/products/terrain-50.html'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            scm {
+                delegate.url 'scm:git@github.com:snodnipper/terrain50-java.git'
+                connection 'scm:git@github.com:snodnipper/terrain50-java.git'
+                developerConnection 'scm:git@github.com:snodnipper/terrain50-java.git'
+            }
+
+            developers {
+                developer {
+                    id 'snodnipper'
+                    name 'Snodnipper'
+                }
+                developer {
+                    id 'Meez_Rose'
+                    name 'Emelia Szor'
+                }
             }
         }
     }
