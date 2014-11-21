@@ -4,7 +4,7 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 
 mainClassName = 'hello.HelloTerrain50'
-version =  '0.1.0'
+version =  '0.1.0-SNAPSHOT'
 group = 'uk.co.ordnancesurvey.api'
 
 // tag::repositories[]
@@ -18,6 +18,7 @@ repositories {
 jar {
     baseName = 'elevation'
     version =  '0.1.0'
+    //version =  '0.1.0-SNAPSHOT'
 }
 // end::jar[]
 
@@ -27,6 +28,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
+    testCompile 'junit:junit:3.8.2'
 }
 // end::dependencies[]
 
@@ -62,7 +64,8 @@ uploadArchives {
     repositories {
         mavenDeployer {
             mavenLocal()
-            repository(url: "http://lv515:8081/nexus/content/repositories/releases") {
+            // repository(url: "http://lv515:8081/nexus/content/repositories/releases") {
+            repository(url: "http://lv515:8081/nexus/content/repositories/snapshots") {
                 authentication(userName: mavenUser, password: mavenPassword)
             }
         }

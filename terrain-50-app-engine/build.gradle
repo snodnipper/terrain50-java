@@ -8,8 +8,10 @@ buildscript {
 }
 
 repositories {
-    mavenLocal();
-    mavenCentral();
+    mavenCentral()
+    maven {
+        url = mavenOsSnapshot()
+    }
 }
 
 apply plugin: 'java'
@@ -26,7 +28,8 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
-    compile 'uk.co.ordnancesurvey.api:elevation:0.1.0'
+    // compile 'uk.co.ordnancesurvey.api:elevation:0.1.0-SNAPSHOT'
+    compile project(':terrain-50-java')
 }
 
 appengine {
@@ -34,4 +37,11 @@ appengine {
     appcfg {
         oauth2 = true
     }
+}
+
+String mavenOsRelease() {
+    'http://lv515:8081/nexus/content/repositories/snapshots'
+}
+String mavenOsSnapshot() {
+    'http://lv515:8081/nexus/content/repositories/snapshots'
 }
