@@ -38,21 +38,6 @@ task wrapper(type: Wrapper) {
 }
 // end::wrapper[]
 
-task writeNewPom << {
-    pom {
-        project {
-            inceptionYear '2014'
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-        }
-    }.writeTo("$buildDir/newpom.xml")
-}
-
 /**
  * Note: to upload the archive the developer must specify the username and password in their gradle
  * properties file:
