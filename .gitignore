@@ -4,4 +4,12 @@ build
 *.iml
 *.apk
 *.class
+
+# Built files
 *.jar
+
+# OSX files
+.DS_STORE
+
+# Local configuration file (SDK path etc.)
+local.properties
