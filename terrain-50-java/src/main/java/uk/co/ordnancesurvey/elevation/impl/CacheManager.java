@@ -4,7 +4,7 @@ import java.util.Map;
 
 import uk.co.ordnancesurvey.elevation.ElevationProvider;
 
-class CacheManager {
+class CacheManager implements ElevationProvider {
     private static final int MAX_CACHE_SIZE = 100;
     Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
     ElevationProvider mFileManager = new FileManager();

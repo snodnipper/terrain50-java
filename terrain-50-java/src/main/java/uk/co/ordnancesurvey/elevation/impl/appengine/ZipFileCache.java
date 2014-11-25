@@ -18,7 +18,7 @@ class ZipFileCache implements ElevationProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
-    private static final Logger sLogger = Logger.getLogger(ZipFileCache.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ZipFileCache.class.getName());
 
     private NetworkManager mNetworkManager = new NetworkManager();
     private Map<String, byte[]> mZipFileCache = new MaxSizeHashMap<String, byte[]>(MAX_CACHE_SIZE);
@@ -44,7 +44,7 @@ class ZipFileCache implements ElevationProvider {
             String asciiGrid = EsriAsciiGrid.getAsciiGrid(zippedData);
             return EsriAsciiGrid.getValue(easting, northing, asciiGrid);
         } catch (IOException e) {
-            sLogger.log(Level.WARNING, "issues getting zipped elevation data", e);
+            LOGGER.log(Level.WARNING, "issues getting zipped elevation data", e);
             e.printStackTrace();
         }
         return String.valueOf(Float.MIN_VALUE);
@@ -66,10 +66,10 @@ class ZipFileCache implements ElevationProvider {
             try {
                 mZipFileCache = (Map<String, byte[]>) mMemcacheService.get(MemCache.KEY_ZIP_FILE);
             } catch (ClassCastException exc) {
-                sLogger.log(Level.WARNING, "Error restoring object from memcache", exc);
+                LOGGER.log(Level.WARNING, "Error restoring object from memcache", exc);
             }
         } else {
-            sLogger.log(Level.INFO, "Creating fresh zip file cache");
+            LOGGER.log(Level.INFO, "Creating fresh zip file cache");
             mMemcacheService.put(MemCache.KEY_ZIP_FILE, mZipFileCache);
         }
     }

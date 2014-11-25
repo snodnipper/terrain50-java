@@ -14,7 +14,7 @@ class CacheManager implements ElevationProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
-    private static final Logger sLogger = Logger.getLogger(ZipFileCache.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ZipFileCache.class.getName());
 
     ElevationProvider mZipFileCache = new ZipFileCache();
     Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
@@ -40,10 +40,10 @@ class CacheManager implements ElevationProvider {
             try {
                 mMap = (Map<String, String>) mMemcacheService.get(MemCache.KEY_CACHE_MANAGER);
             } catch (ClassCastException exc) {
-                sLogger.log(Level.WARNING, "Error restoring object from memcache", exc);
+                LOGGER.log(Level.WARNING, "Error restoring object from memcache", exc);
             }
         } else {
-            sLogger.log(Level.INFO, "Creating fresh cache manager cache");
+            LOGGER.log(Level.INFO, "Creating fresh cache manager cache");
             mMemcacheService.put(MemCache.KEY_CACHE_MANAGER, mMap);
         }
     }

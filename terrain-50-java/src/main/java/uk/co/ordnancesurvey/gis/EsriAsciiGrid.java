@@ -23,7 +23,7 @@ import java.util.zip.ZipInputStream;
  * See: https://en.wikipedia.org/wiki/Esri_grid
  */
 public class EsriAsciiGrid {
-    private static final Logger sLogger = Logger.getLogger(EsriAsciiGrid.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EsriAsciiGrid.class.getName());
 
     private static final int HEADER = 5;
 
@@ -57,7 +57,7 @@ public class EsriAsciiGrid {
 
     public static String getAsciiGrid(final byte[] input) throws IOException {
 
-        sLogger.log(Level.INFO, "Size: " + input.length + " bytes.");
+        LOGGER.log(Level.INFO, "Size: " + input.length + " bytes.");
 
         String result = "";
         ByteArrayInputStream bis = new ByteArrayInputStream(input);
@@ -78,14 +78,14 @@ public class EsriAsciiGrid {
                 Pattern pattern = Pattern.compile(".*[.]asc$");
                 Matcher matcher = pattern.matcher(filename);
                 if (!matcher.find()) {
-                    sLogger.log(Level.INFO, "Ignoring: " + filename);
+                    LOGGER.log(Level.INFO, "Ignoring: " + filename);
                     continue;
                 }
 
                 String s = String.format("entry: %s len %d added %TD",
                         entry.getName(), entry.getSize(),
                         new Date(entry.getTime()));
-                sLogger.log(Level.INFO, s);
+                LOGGER.log(Level.INFO, s);
 
                 // Once we get the entry from the stream, the stream is
                 // positioned read to read the raw data, and we keep
@@ -108,7 +108,7 @@ public class EsriAsciiGrid {
             // we must always close the zip file.
             stream.close();
         }
-        sLogger.log(Level.INFO, "ASCII size: " + result.getBytes().length + " bytes");
+        LOGGER.log(Level.INFO, "ASCII size: " + result.getBytes().length + " bytes");
         return result;
     }
 
@@ -134,7 +134,7 @@ public class EsriAsciiGrid {
                 Pattern pattern = Pattern.compile(".*[.]asc$");
                 Matcher matcher = pattern.matcher(filename);
                 if (matcher.find()) {
-                    sLogger.log(Level.INFO, "Found it: " + filename);
+                    LOGGER.log(Level.INFO, "Found it: " + filename);
 
                     InputStream inputStream = file.getInputStream(entry);
                     BufferedInputStream bis = new BufferedInputStream(inputStream);
