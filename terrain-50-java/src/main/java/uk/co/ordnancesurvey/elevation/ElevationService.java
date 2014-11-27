@@ -20,7 +20,6 @@ public interface ElevationService {
      */
     String getElevation(String latitude, String longitude);
 
-
     /**
      * input values specified as decimal degrees
      */

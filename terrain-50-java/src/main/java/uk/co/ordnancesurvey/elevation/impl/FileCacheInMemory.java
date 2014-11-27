@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.co.ordnancesurvey.elevation.*;
+import uk.co.ordnancesurvey.elevation.impl.util.MaxSizeHashMap;
 import uk.co.ordnancesurvey.gis.BngTools;
 import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
 
-public class FileCacheInMemory implements ElevationProvider {
+public class FileCacheInMemory implements NativeElevationProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
@@ -53,7 +53,7 @@ public class FileCacheInMemory implements ElevationProvider {
     }
 
     @Override
-    public void setNext(ElevationProvider next) {
+    public void setNext(NativeElevationProvider next) {
         throw new UnsupportedOperationException("Lowest level - the buck stops here.");
     }
 

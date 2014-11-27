@@ -2,10 +2,17 @@ package uk.co.ordnancesurvey.elevation;
 
 public interface ElevationProvider {
 
-    String getElevation(String easting, String northing);
+    /**
+     * @return true if the provider contains elevation data for the given input
+     */
+    boolean containsLatLon(double latitude, double longitude);
+
+    String getElevation(double x, double y);
+
+    String getElevationFromLatLon(double latitude, double longitude);
 
     /**
-     * set the next chain of responsibility provider
+     * @return the spatial reference ID
      */
-    void setNext(ElevationProvider next);
+    int getSpatialRefererence();
 }

@@ -1,8 +1,10 @@
 package uk.co.ordnancesurvey.elevation;
 
 import uk.co.ordnancesurvey.elevation.impl.CacheManager;
+import uk.co.ordnancesurvey.elevation.impl.ElevationProviderBng;
 import uk.co.ordnancesurvey.elevation.impl.FileCache;
 import uk.co.ordnancesurvey.elevation.impl.FileCacheInMemory;
+import uk.co.ordnancesurvey.elevation.impl.NativeElevationProvider;
 import uk.co.ordnancesurvey.elevation.impl.NetworkManager;
 import uk.co.ordnancesurvey.elevation.impl.PrimaryCacheProvider;
 import uk.co.ordnancesurvey.elevation.impl.SecondaryCacheProvider;
@@ -53,8 +55,8 @@ public class Configuration {
         }
 
         public Configuration build() {
-            ElevationProvider primaryElevationProvider;
-            ElevationProvider secondaryElevationProvider;
+            NativeElevationProvider primaryElevationProvider;
+            NativeElevationProvider secondaryElevationProvider;
 
             boolean hasPrimaryCache = primaryCacheProvider != null;
             if (hasPrimaryCache) {
@@ -74,7 +76,7 @@ public class Configuration {
 
             primaryElevationProvider.setNext(secondaryElevationProvider);
 
-            elevationProvider = primaryElevationProvider;
+            elevationProvider = new ElevationProviderBng(primaryElevationProvider);
             return new Configuration(this);
         }
     }

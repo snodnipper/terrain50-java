@@ -10,12 +10,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.co.ordnancesurvey.elevation.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.gis.BngTools;
 import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
 
-public class FileCache implements ElevationProvider {
+public class FileCache implements NativeElevationProvider {
 
     private static final Logger LOGGER = Logger.getLogger(FileCache.class.getName());
     private static final String CACHE_INTERNAL_NAME = "os-elevation-cache";
@@ -61,7 +60,7 @@ public class FileCache implements ElevationProvider {
     }
 
     @Override
-    public void setNext(ElevationProvider next) {
+    public void setNext(NativeElevationProvider next) {
 
     }
 

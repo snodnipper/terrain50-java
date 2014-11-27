@@ -1,78 +1,69 @@
 package uk.co.ordnancesurvey.elevation;
 
-import uk.co.ordnancesurvey.gis.BngTools;
-import uk.co.ordnancesurvey.gis.Point;
-import uk.co.ordnancesurvey.gis.projection.Bng;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ElevationServiceImpl implements ElevationService {
 
-    private ElevationProvider mNext;
+    private static final Logger LOGGER = Logger.getLogger(ElevationServiceImpl.class.getName());
 
-    public ElevationServiceImpl(ElevationProvider elevationProvider) {
-        mNext = elevationProvider;
-    }
+    private final Map<Integer, ElevationProvider> mElevationProviders
+            = new HashMap<Integer, ElevationProvider>();
 
-    public String getElevation(final String latitude, final String longitude) {
-        double latitudeToUse = Double.parseDouble(latitude);
-        double longitudeToUse = Double.parseDouble(longitude);
-        return getElevation(latitudeToUse, longitudeToUse);
-    }
-
-    public String getElevation(double latitude, double longitude) {
-        if (Bng.within(latitude, longitude)) {
-            double[] eastingNorthing = Bng.toGridPoint(latitude, longitude);
-            return getElevationFromBng(eastingNorthing[0], eastingNorthing[1]);
-        } else {
-            return ElevationService.RESULT_UNKNOWN;
+    /**
+     * Note: only one elevation provider per spatial reference is supported
+     */
+    public ElevationServiceImpl(ElevationProvider... elevationProviders) {
+        for (ElevationProvider elevationProvider : elevationProviders) {
+            mElevationProviders.put(elevationProvider.getSpatialRefererence(), elevationProvider);
         }
     }
 
+    @Override
+    public String getElevation(final String latitude, final String longitude) {
+        return getElevation(4326, longitude, latitude);
+    }
+
+    @Override
+    public String getElevation(double latitude, double longitude) {
+        return getElevation(4326, longitude, latitude);
+    }
+
+    @Override
     public String getElevation(int srid, String x, String y) {
-        switch (srid) {
-            case SRID_4326:
-                return getElevation(x, y);
-            case SRID_27700:
-                return getElevationFromBng(x, y);
-            default:
-                throw new IllegalArgumentException("unsupported spatial reference: " + srid);
+        try {
+            double x_ = Double.parseDouble(x);
+            double y_ = Double.parseDouble(y);
+            return getElevation(srid, x_, y_);
+        } catch (NumberFormatException numberFormatException) {
+            LOGGER.log(Level.SEVERE, "invalid parameters", numberFormatException);
+            return ElevationService.RESULT_ERROR;
+        } catch (NullPointerException nullPointerException) {
+            LOGGER.log(Level.SEVERE, "invalid parameters", nullPointerException);
+            return ElevationService.RESULT_ERROR;
         }
     }
 
     @Override
     public String getElevation(int srid, double x, double y) {
-        switch (srid) {
-            case SRID_4326:
-                return getElevation(x, y);
-            case SRID_27700:
-                return getElevationFromBng(x, y);
-            default:
-                throw new IllegalArgumentException("unsupported spatial reference: " + srid);
+        ElevationProvider elevationProvider = mElevationProviders.get(srid);
+
+        boolean nativeProvider = elevationProvider != null;
+        if (nativeProvider) {
+            return elevationProvider.getElevation(x, y);
         }
-    }
 
-    public String getElevationFromBng(String gridReference) {
-        Point point = BngTools.parseGridReference(gridReference);
-        return getElevationFromBng(point.getX(), point.getY());
-    }
+        boolean globalProjection = srid == SRID_4326;
+        if (globalProjection) {
+            for (ElevationProvider provider : mElevationProviders.values()) {
+                if (provider.containsLatLon(y, x)) {
+                    return provider.getElevationFromLatLon(y, x);
+                }
+            }
 
-    public String getElevationFromBng(String easting, String northing) {
-        try {
-            return getElevationFromBng(Double.valueOf(easting), Double.valueOf(northing));
-        } catch (NumberFormatException nfe) {
-            return ElevationService.RESULT_ERROR;
         }
-    }
-
-    public String getElevationFromBng(double easting, double northing) {
-        return getElevationFromBngWithValidation(easting, northing);
-    }
-
-    private String getElevationFromBngWithValidation(double easting, double northing) {
-        if (Bng.validExtent(easting, northing)) {
-            return mNext.getElevation(String.valueOf(easting), String.valueOf(northing));
-        } else {
-            return ElevationService.RESULT_UNKNOWN;
-        }
+        return RESULT_UNKNOWN;
     }
 }
-
