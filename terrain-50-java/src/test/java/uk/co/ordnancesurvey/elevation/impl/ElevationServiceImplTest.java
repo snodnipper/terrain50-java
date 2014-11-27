@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
+import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,23 +19,23 @@ public class ElevationServiceImplTest {
 
     @Test
     public void testElevationService() {
-        ElevationService elevationService = new ElevationServiceImpl();
+        ElevationService elevationService = ElevationServiceProvider.getInstance();
         String easting = "402945";
         String northing = "249990";
         String expected = "101.8";
-        String actual = elevationService.getElevationFromBng(easting, northing);
+        String actual = elevationService.getElevation(27700, easting, northing);
         assertEquals(expected, actual);
     }
 
     @Test
     public void testLondonElevation() {
-        ElevationService elevationService = new ElevationServiceImpl();
+        ElevationService elevationService = ElevationServiceProvider.getInstance();
 
         // London
         String easting = "530050";
         String northing = "180361";
         String expected = "7.3";
-        String actual = elevationService.getElevationFromBng(easting, northing);
+        String actual = elevationService.getElevation(27700, easting, northing);
         assertEquals(expected, actual);
 
         String latitude = "51.50722";
@@ -47,7 +48,7 @@ public class ElevationServiceImplTest {
     @Test
     public void testLoad() {
         AtomicInteger counter = new AtomicInteger(0);
-        ElevationService elevationService = new ElevationServiceImpl();
+        ElevationService elevationService = ElevationServiceProvider.getInstance();
         run(counter, elevationService);
         run(counter, elevationService);
         run(counter, elevationService);
@@ -79,7 +80,7 @@ public class ElevationServiceImplTest {
                 String easting = "402945";
                 String northing = "249990";
                 String expected = "101.8";
-                String actual = elevationService.getElevationFromBng(easting, northing);
+                String actual = elevationService.getElevation(27700, easting, northing);
                 assertEquals(expected, actual);
                 atomicInteger.incrementAndGet();
             }

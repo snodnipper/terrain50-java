@@ -11,6 +11,16 @@ public class Bng {
     private static final double WGS84_A = 6378137.000, WGS84_B = 6356752.3141;
     private static final double NATGRID_F0 = 0.9996012717, NATGRID_LAT0 = 49 * DEG, NATGRID_LNG0 = -2 * DEG, NATGRID_E0 = 400000, NATGRID_N0 = -100000;
 
+    private static final double MAX_LON = 3.63202114501;
+    private static final double MAX_LAT = 61.4645902176;
+    private static final double MIN_LON = -7.55716018087;
+    private static final double MIN_LAT = 49.766807227;
+
+    private static final double MIN_EASTING = 0;
+    private static final double MIN_NORTHING = 0;
+    private static final double MAX_EASTING = 700000;
+    private static final double MAX_NORTHING = 1300000;
+
     /**
      * Converts a WGS84 latitude/longitude to the corresponding GridPoint.
      * Accuracy depends on the projection used.
@@ -26,6 +36,15 @@ public class Bng {
         double AVERAGE_GPS_ALTITUDE = 53;
         getOSCoords(latitude, longitude, AVERAGE_GPS_ALTITUDE, temp);
         return new double[]{temp[0], temp[1]};
+    }
+
+    public static boolean validExtent(double easting, double northing) {
+        return easting >= MIN_EASTING && easting <= MAX_EASTING
+                && northing >= MIN_NORTHING && northing <=MAX_NORTHING;
+    }
+
+    public static boolean within(double lat, double lon) {
+        return lat > MIN_LAT && lat < MAX_LAT && lon > MIN_LON && lon < MAX_LON;
     }
 
     /**

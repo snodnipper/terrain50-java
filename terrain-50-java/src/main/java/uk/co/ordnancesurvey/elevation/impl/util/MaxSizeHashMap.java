@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl;
+package uk.co.ordnancesurvey.elevation.impl.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

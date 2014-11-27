@@ -124,6 +124,8 @@ public class EsriAsciiGrid {
         }
         final ZipFile file = new ZipFile(zipFile);
 
+        LOGGER.log(Level.INFO, "Using: " + zipFile.getAbsolutePath());
+
         try {
             final Enumeration<? extends ZipEntry> entries = file.entries();
             while (entries.hasMoreElements()) {
@@ -153,13 +155,13 @@ public class EsriAsciiGrid {
                         }
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.SEVERE, "error building string from zip entry", e);
                     } finally {
                         if (br != null) {
                             try {
                                 br.close();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                LOGGER.log(Level.SEVERE, "error closing zip buffered reader", e);
                             }
                         }
                     }

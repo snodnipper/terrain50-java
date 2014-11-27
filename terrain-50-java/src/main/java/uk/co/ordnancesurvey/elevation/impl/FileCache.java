@@ -4,27 +4,41 @@ package uk.co.ordnancesurvey.elevation.impl;
 import com.google.common.util.concurrent.Striped;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.co.ordnancesurvey.elevation.ElevationProvider;
+import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.gis.BngTools;
 import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
 
-class FileManager implements ElevationProvider {
+public class FileCache implements ElevationProvider {
 
-    private static final int STRIPE_COUNT = 10;
-    private static final Logger LOGGER = Logger.getLogger(FileManager.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FileCache.class.getName());
+    private static final String CACHE_INTERNAL_NAME = "os-elevation-cache";
+
+    private static int sStripCount = 10;
 
     private final File mCacheDirectory;
     private final NetworkManager mNetworkManager;
-    private Striped<Lock> mStripedLock = Striped.lazyWeakLock(STRIPE_COUNT);
+    private Striped<Lock> mStripedLock;
 
-    public FileManager() {
-        mCacheDirectory = new File(System.getProperty("java.io.tmpdir"));
-        mNetworkManager = new NetworkManager(mCacheDirectory);
+    public FileCache(NetworkManager networkManager) {
+        mCacheDirectory = new File(System.getProperty("java.io.tmpdir") +
+                File.separator +
+                CACHE_INTERNAL_NAME);
+        if (!mCacheDirectory.exists()) {
+            boolean created = mCacheDirectory.mkdir();
+            if (!created) {
+                throw new IllegalStateException("cannot create cache directory");
+            }
+        }
+
+        mNetworkManager = networkManager;
+        mStripedLock = Striped.lazyWeakLock(sStripCount);
     }
 
     @Override
@@ -35,11 +49,24 @@ class FileManager implements ElevationProvider {
             if (!file.exists()) {
                 download(file);
             }
-            return EsriAsciiGrid.getValue(easting, northing, file);
+            String value = EsriAsciiGrid.getValue(easting, northing, file);
+            if (value.isEmpty()) {
+                return ElevationService.RESULT_UNKNOWN;
+            }
+            return value;
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "cannot get elevation from file", e);
         }
-        return String.valueOf(Float.MIN_VALUE);
+        return ElevationService.RESULT_ERROR;
+    }
+
+    @Override
+    public void setNext(ElevationProvider next) {
+
+    }
+
+    public static void setConcurrentDownloads(int concurrentDownloads) {
+        sStripCount = concurrentDownloads;
     }
 
     private void download(File file) throws IOException {
@@ -47,8 +74,13 @@ class FileManager implements ElevationProvider {
         lock.lock();
         try {
             if (!file.exists()) {
-                mNetworkManager.download(file);
+                byte[] bytes = mNetworkManager.download(file);
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(bytes);
+                fos.close();
             }
+        } catch (Exception lazy) {
+            LOGGER.log(Level.SEVERE, "cannot download file", lazy);
         } finally {
             lock.unlock();
         }

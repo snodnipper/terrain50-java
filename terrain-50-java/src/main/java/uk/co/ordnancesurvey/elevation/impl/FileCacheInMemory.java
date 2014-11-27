@@ -1,7 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl.appengine;
-
-import com.google.appengine.api.memcache.MemcacheService;
-import com.google.appengine.api.memcache.MemcacheServiceFactory;
+package uk.co.ordnancesurvey.elevation.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,22 +6,27 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.co.ordnancesurvey.elevation.ElevationProvider;
-import uk.co.ordnancesurvey.elevation.MaxSizeHashMap;
+import uk.co.ordnancesurvey.elevation.*;
 import uk.co.ordnancesurvey.gis.BngTools;
 import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
 
-class ZipFileCache implements ElevationProvider {
+public class FileCacheInMemory implements ElevationProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
-    private static final Logger LOGGER = Logger.getLogger(ZipFileCache.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(FileCacheInMemory.class.getName());
 
-    private NetworkManager mNetworkManager = new NetworkManager();
-    private Map<String, byte[]> mZipFileCache = new MaxSizeHashMap<String, byte[]>(MAX_CACHE_SIZE);
+    private final NetworkManager mNetworkManager;
+    private final Map<String, byte[]> mZipFileCache;
 
-    public ZipFileCache() {
-        restoreCache();
+    /**
+     * @param networkManager
+     * @param secondaryCacheProvider
+     */
+    public FileCacheInMemory(NetworkManager networkManager, SecondaryCacheProvider secondaryCacheProvider) {
+        Map<String, byte[]> defaultCache = new MaxSizeHashMap<String, byte[]>(MAX_CACHE_SIZE);
+        mZipFileCache = secondaryCacheProvider.getSecondaryCache(defaultCache);
+        mNetworkManager = networkManager;
     }
 
     @Override
@@ -50,6 +52,11 @@ class ZipFileCache implements ElevationProvider {
         return String.valueOf(Float.MIN_VALUE);
     }
 
+    @Override
+    public void setNext(ElevationProvider next) {
+        throw new UnsupportedOperationException("Lowest level - the buck stops here.");
+    }
+
     private String getFilename(String easting, String northing) {
         String gridRef = BngTools.toGridReference(1, Double.parseDouble(easting),
                 Double.parseDouble(northing)).replaceAll(" ", "");
@@ -58,19 +65,5 @@ class ZipFileCache implements ElevationProvider {
         String y = gridRef.substring(3, 4);
         String name = characters + x + y +  "_OST50GRID_20130611";
         return name + ".zip";
-    }
-
-    private void restoreCache() {
-        MemcacheService mMemcacheService = MemcacheServiceFactory.getMemcacheService();
-        if (mMemcacheService.get(MemCache.KEY_ZIP_FILE) != null) {
-            try {
-                mZipFileCache = (Map<String, byte[]>) mMemcacheService.get(MemCache.KEY_ZIP_FILE);
-            } catch (ClassCastException exc) {
-                LOGGER.log(Level.WARNING, "Error restoring object from memcache", exc);
-            }
-        } else {
-            LOGGER.log(Level.INFO, "Creating fresh zip file cache");
-            mMemcacheService.put(MemCache.KEY_ZIP_FILE, mZipFileCache);
-        }
     }
 }
