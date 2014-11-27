@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl.appengine;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,16 +6,19 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-class NetworkManager {
+public class NetworkManager {
 
-    private static final String ENDPOINT =
-            "https://github.com/snodnipper/terrain50-java/raw/master/data/";
+    private static String mTerrain50DataEndpoint;
+
+    public NetworkManager(String terrain50DataEndpoint) {
+        mTerrain50DataEndpoint = terrain50DataEndpoint;
+    }
 
     /**
      * Uses the first two characters as a subdirectory - very internals
      */
     public static byte[] download(File file) throws IOException {
-        String url = ENDPOINT + file.getName().substring(0, 2) + "/" + file.getName();
+        String url = mTerrain50DataEndpoint + file.getName().substring(0, 2) + "/" + file.getName();
         return download2(url);
     }
 

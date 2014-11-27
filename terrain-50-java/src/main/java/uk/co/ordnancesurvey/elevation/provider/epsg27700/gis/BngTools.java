@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.gis;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.gis;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -9,13 +9,27 @@ import com.google.gson.GsonBuilder;
 
 import javax.servlet.http.*;
 
+import uk.co.ordnancesurvey.api.appengine.AppEngineMemCacheProvider;
+import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.impl.appengine.ElevationServiceImpl;
+import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
+import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.impl.Strategy;
 
 public class ElevationServlet extends HttpServlet {
 
-    private static ElevationService sElevationService = new ElevationServiceImpl();
-    private static Gson mGson = new GsonBuilder().setPrettyPrinting().create();
+    private static final ElevationService sElevationService;
+    private static final Gson mGson = new GsonBuilder().setPrettyPrinting().create();
+
+    static {
+        AppEngineMemCacheProvider appEngineMemCacheProvider = new AppEngineMemCacheProvider();
+        Configuration configuration = new Configuration.Builder()
+                .setStrategy(Strategy.MAX_PERFORMANCE)
+                .setPrimaryCache(appEngineMemCacheProvider)
+                .setSecondaryCache(appEngineMemCacheProvider)
+                .build();
+        sElevationService = ElevationServiceProvider.getInstance(configuration);
+    }
 
     public static void main(String args[]) {
     }
@@ -35,7 +49,8 @@ public class ElevationServlet extends HttpServlet {
                 && req.getParameterMap().containsKey("northing")) {
             String easting = req.getParameter("easting");
             String northing = req.getParameter("northing");
-            String elevation = sElevationService.getElevationFromBng(easting, northing);
+            String elevation = sElevationService.getElevation(SpatialReference.EPSG_27700, easting,
+                    northing);
 
             String json = JsonDataV1.export(elevation);
             resp.setContentType("application/json");

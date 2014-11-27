@@ -6,8 +6,14 @@ package uk.co.ordnancesurvey.elevation;
  */
 public interface ElevationService {
 
+    public static final String RESULT_UNKNOWN = "";
+    public static final String RESULT_ERROR = "ERROR";
+
     /**
-     * String input values specified as decimal degrees
+     * @param latitude specified in decimal degrees
+     * @param longitude specified in decimal degrees
+     * @return the value of elevation in meters or "" if the request was successful _but_ the data
+     * is simply unknown or "ERROR" caused by an underlying problem
      */
     String getElevation(String latitude, String longitude);
 
@@ -17,15 +23,19 @@ public interface ElevationService {
     String getElevation(double latitude, double longitude);
 
     /**
-     * e.g. 591235 196785
+     * @param srid the spatial reference of the input coordinates
+     * @param x the x coordinate of the requested elevation point
+     * @param y the y coordinate of the requested elevation point
+     * @return
      */
-    String getElevationFromBng(double eastings, double northings);
+    String getElevation(String srid, String x, String y);
+
+    String getElevation(String srid, double x, double y);
 
     /**
-     * @param gridReference e.g. TQ 9123 9678
-     * @return a String value of the altitude
+     * a convenience method to obtain elevation values for multiple inputs
      */
-    String getElevationFromBng(String gridReference);
+    String[] getElevationValues(String[] latitude, String[] longitude);
 
-    String getElevationFromBng(String easting, String northing);
+    String[] getElevationValues(double[] latitude, double[] longitude);
 }

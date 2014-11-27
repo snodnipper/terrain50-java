@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.gis;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.gis;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -117,12 +117,14 @@ public class EsriAsciiGrid {
      * @return ASCII grid file
      * @throws java.io.IOException
      */
-    private static String getAsciiGrid(File zipFile) throws IOException {
+    public static String getAsciiGrid(File zipFile) throws IOException {
 
         if (!zipFile.exists()) {
             throw new IOException("cannot find file: " + zipFile.getPath());
         }
         final ZipFile file = new ZipFile(zipFile);
+
+        // LOGGER.log(Level.INFO, "Using: " + zipFile.getAbsolutePath());
 
         try {
             final Enumeration<? extends ZipEntry> entries = file.entries();
@@ -134,7 +136,7 @@ public class EsriAsciiGrid {
                 Pattern pattern = Pattern.compile(".*[.]asc$");
                 Matcher matcher = pattern.matcher(filename);
                 if (matcher.find()) {
-                    LOGGER.log(Level.INFO, "Found it: " + filename);
+                    // LOGGER.log(Level.INFO, "Found it: " + filename);
 
                     InputStream inputStream = file.getInputStream(entry);
                     BufferedInputStream bis = new BufferedInputStream(inputStream);
@@ -153,13 +155,13 @@ public class EsriAsciiGrid {
                         }
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.SEVERE, "error building string from zip entry", e);
                     } finally {
                         if (br != null) {
                             try {
                                 br.close();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                LOGGER.log(Level.SEVERE, "error closing zip buffered reader", e);
                             }
                         }
                     }

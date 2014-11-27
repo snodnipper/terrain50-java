@@ -1,15 +1,11 @@
 apply plugin: 'maven'
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'application'
 
-mainClassName = 'hello.HelloTerrain50'
-version =  '0.1.0-SNAPSHOT'
+version =  '0.1.0'
 group = 'uk.co.ordnancesurvey.api'
 
 // tag::repositories[]
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 // end::repositories[]
@@ -17,25 +13,26 @@ repositories {
 // tag::jar[]
 jar {
     baseName = 'elevation'
-    version =  '0.1.0'
-    //version =  '0.1.0-SNAPSHOT'
 }
 // end::jar[]
 
+compileJava {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+}
+
 // tag::dependencies[]
 dependencies {
-    compile 'javax.servlet:servlet-api:2.5'
     compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
-    compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
     compile 'com.google.guava:guava:18.0'
+    compile 'org.mozilla:rhino:1.7R4'
     testCompile 'junit:junit:4.11'
 }
 // end::dependencies[]
 
 // tag::wrapper[]
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.11'
+    gradleVersion = '2.2.1'
 }
 // end::wrapper[]
 
