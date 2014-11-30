@@ -2,14 +2,15 @@ package uk.co.ordnancesurvey.elevation.impl;
 
 import java.util.Map;
 
-import uk.co.ordnancesurvey.elevation.impl.util.MaxSizeHashMap;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.util.MaxSizeHashMap;
+import uk.co.ordnancesurvey.elevation.provider.DataProvider;
 
-public class CacheManager implements NativeElevationProvider {
+public class CacheManager implements DataProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
     protected Map<String, String> mMap = new MaxSizeHashMap<String, String>(MAX_CACHE_SIZE);
-    private NativeElevationProvider mNext;
+    private DataProvider mNext;
 
     public CacheManager() {}
 
@@ -27,7 +28,7 @@ public class CacheManager implements NativeElevationProvider {
         return mMap.get(key);
     }
 
-    public void setNext(NativeElevationProvider next) {
+    public void setNext(DataProvider next) {
         mNext = next;
     }
 }

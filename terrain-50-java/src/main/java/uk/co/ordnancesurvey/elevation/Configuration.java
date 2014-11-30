@@ -1,23 +1,31 @@
 package uk.co.ordnancesurvey.elevation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.co.ordnancesurvey.elevation.impl.CacheManager;
-import uk.co.ordnancesurvey.elevation.impl.ElevationProviderBng;
-import uk.co.ordnancesurvey.elevation.impl.FileCache;
-import uk.co.ordnancesurvey.elevation.impl.FileCacheInMemory;
-import uk.co.ordnancesurvey.elevation.impl.NativeElevationProvider;
-import uk.co.ordnancesurvey.elevation.impl.NetworkManager;
+import uk.co.ordnancesurvey.elevation.provider.ElevationProvider;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.ElevationProviderBng;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.FileCache;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.FileCacheInMemory;
+import uk.co.ordnancesurvey.elevation.provider.DataProvider;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.NetworkManager;
 import uk.co.ordnancesurvey.elevation.impl.PrimaryCacheProvider;
 import uk.co.ordnancesurvey.elevation.impl.SecondaryCacheProvider;
+import uk.co.ordnancesurvey.elevation.transformation.Transformer;
+import uk.co.ordnancesurvey.elevation.transformation.epsg27700.Transformer27700;
 
 public class Configuration {
 
     private final int mConcurrentFileRequests;
     private final ElevationProvider mElevationProvider;
+    private List<Transformer> mTransformers;
 
 
-    private Configuration(Builder builder){
+    private Configuration(Builder builder) {
         mConcurrentFileRequests = builder.concurrentFileRequests;
         mElevationProvider = builder.elevationProvider;
+        mTransformers = builder.transformers;
     }
 
     public static class Builder {
@@ -26,6 +34,16 @@ public class Configuration {
         private PrimaryCacheProvider primaryCacheProvider;
         private SecondaryCacheProvider secondaryCacheProvider;
         private ElevationProvider elevationProvider = null;
+        private List<Transformer> transformers = new ArrayList<Transformer>();
+
+        /**
+         * @param val a coordinate transformer from global (WGS84 SRID 4326) lat/lon coordinates to
+         *            native values for a particular provider.
+         */
+        public Builder addTransformer(Transformer val) {
+            transformers.add(val);
+            return this;
+        }
 
         public Builder concurrentFileRequests(int val) {
             concurrentFileRequests = val;
@@ -55,30 +73,37 @@ public class Configuration {
         }
 
         public Configuration build() {
-            NativeElevationProvider primaryElevationProvider;
-            NativeElevationProvider secondaryElevationProvider;
+            DataProvider primaryDataProvider;
+            DataProvider secondaryDataProvider;
 
             boolean hasPrimaryCache = primaryCacheProvider != null;
             if (hasPrimaryCache) {
-                primaryElevationProvider = new CacheManager(primaryCacheProvider);
+                primaryDataProvider = new CacheManager(primaryCacheProvider);
             } else {
-                primaryElevationProvider = new CacheManager();
+                primaryDataProvider = new CacheManager();
             }
 
             boolean hasSecondaryCache = secondaryCacheProvider != null;
             NetworkManager networkManager = new NetworkManager(terrain50DataUrl);
             if (hasSecondaryCache) {
-                secondaryElevationProvider = new FileCacheInMemory(networkManager,
+                secondaryDataProvider = new FileCacheInMemory(networkManager,
                         secondaryCacheProvider);
             } else {
-                secondaryElevationProvider = new FileCache(networkManager);
+                secondaryDataProvider = new FileCache(networkManager);
             }
 
-            primaryElevationProvider.setNext(secondaryElevationProvider);
+            primaryDataProvider.setNext(secondaryDataProvider);
 
-            elevationProvider = new ElevationProviderBng(primaryElevationProvider);
+            elevationProvider = new ElevationProviderBng(primaryDataProvider);
+
+            transformers.add(new Transformer27700());
+
             return new Configuration(this);
         }
+    }
+
+    public List<Transformer> getTransformers() {
+        return mTransformers;
     }
 
     public ElevationProvider getElevationProvider() {

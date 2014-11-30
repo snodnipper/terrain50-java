@@ -6,9 +6,6 @@ package uk.co.ordnancesurvey.elevation;
  */
 public interface ElevationService {
 
-    public static final int SRID_4326 = 4326;
-    public static final int SRID_27700 = 27700;
-
     public static final String RESULT_UNKNOWN = "";
     public static final String RESULT_ERROR = "ERROR";
 
@@ -31,7 +28,7 @@ public interface ElevationService {
      * @param y the y coordinate of the requested elevation point
      * @return
      */
-    String getElevation(int srid, String x, String y);
+    String getElevation(String srid, String x, String y);
 
-    String getElevation(int srid, double x, double y);
+    String getElevation(String srid, double x, double y);
 }

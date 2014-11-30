@@ -2,7 +2,8 @@ package hello;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
-import uk.co.ordnancesurvey.gis.projection.Bng;
+import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.projection.Bng;
 
 public class HelloTerrain50 {
     public static void main(String[] args) {
@@ -27,7 +28,7 @@ public class HelloTerrain50 {
 
         ElevationService elevationService = ElevationServiceProvider.getInstance();
 
-        int bng = 27700;
+        String bng = SpatialReference.EPSG_27700;
 
         // Test SP04.asc
         String easting = "405214", northing = "240041";

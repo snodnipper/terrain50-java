@@ -1,38 +1,48 @@
-package uk.co.ordnancesurvey.elevation;
+package uk.co.ordnancesurvey.elevation.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import uk.co.ordnancesurvey.elevation.ElevationService;
+import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.provider.ElevationProvider;
+import uk.co.ordnancesurvey.elevation.transformation.Transformer;
 
 public class ElevationServiceImpl implements ElevationService {
 
     private static final Logger LOGGER = Logger.getLogger(ElevationServiceImpl.class.getName());
 
-    private final Map<Integer, ElevationProvider> mElevationProviders
-            = new HashMap<Integer, ElevationProvider>();
+    private final Map<String, Transformer> mTransformers = new HashMap<String, Transformer>();
+    private final Map<String, ElevationProvider> mElevationProviders
+            = new HashMap<String, ElevationProvider>();
 
     /**
      * Note: only one elevation provider per spatial reference is supported
      */
-    public ElevationServiceImpl(ElevationProvider... elevationProviders) {
+    public ElevationServiceImpl(List<Transformer> transformers, ElevationProvider... elevationProviders) {
         for (ElevationProvider elevationProvider : elevationProviders) {
             mElevationProviders.put(elevationProvider.getSpatialRefererence(), elevationProvider);
+            for (Transformer transformer : transformers) {
+                mTransformers.put(transformer.getSpatialReference(), transformer);
+            }
         }
     }
 
     @Override
     public String getElevation(final String latitude, final String longitude) {
-        return getElevation(4326, longitude, latitude);
+        return getElevation(SpatialReference.EPSG_4326, longitude, latitude);
     }
 
     @Override
     public String getElevation(double latitude, double longitude) {
-        return getElevation(4326, longitude, latitude);
+        return getElevation(SpatialReference.EPSG_4326, longitude, latitude);
     }
 
     @Override
-    public String getElevation(int srid, String x, String y) {
+    public String getElevation(String srid, String x, String y) {
         try {
             double x_ = Double.parseDouble(x);
             double y_ = Double.parseDouble(y);
@@ -47,7 +57,7 @@ public class ElevationServiceImpl implements ElevationService {
     }
 
     @Override
-    public String getElevation(int srid, double x, double y) {
+    public String getElevation(String srid, double x, double y) {
         ElevationProvider elevationProvider = mElevationProviders.get(srid);
 
         boolean nativeProvider = elevationProvider != null;
@@ -55,11 +65,18 @@ public class ElevationServiceImpl implements ElevationService {
             return elevationProvider.getElevation(x, y);
         }
 
-        boolean globalProjection = srid == SRID_4326;
+        boolean globalProjection = srid.equals(SpatialReference.EPSG_4326);
         if (globalProjection) {
+            double latitude = y;
+            double longitude = x;
+
             for (ElevationProvider provider : mElevationProviders.values()) {
-                if (provider.containsLatLon(y, x)) {
-                    return provider.getElevationFromLatLon(y, x);
+                Transformer transformer = mTransformers.get(provider.getSpatialRefererence());
+
+                boolean hasTransformer = transformer != null;
+                if (hasTransformer && transformer.validFor(latitude, longitude)) {
+                    double[] xy = transformer.transform(latitude, longitude);
+                    return provider.getElevation(xy[0], xy[1]);
                 }
             }
 

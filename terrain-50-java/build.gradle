@@ -24,11 +24,11 @@ jar {
 
 // tag::dependencies[]
 dependencies {
-    compile 'javax.servlet:servlet-api:2.5'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.google.appengine:appengine-jsr107cache:1.9.10'
     compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.10'
     compile 'com.google.guava:guava:18.0'
+    compile 'org.mozilla:rhino:1.7R4'
     testCompile 'junit:junit:4.11'
 }
 // end::dependencies[]

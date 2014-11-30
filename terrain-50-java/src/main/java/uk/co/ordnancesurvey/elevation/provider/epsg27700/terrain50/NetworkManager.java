@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

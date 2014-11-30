@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.gis;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.gis;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

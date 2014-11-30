@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,11 +6,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.co.ordnancesurvey.elevation.impl.util.MaxSizeHashMap;
-import uk.co.ordnancesurvey.gis.BngTools;
-import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
+import uk.co.ordnancesurvey.elevation.provider.DataProvider;
+import uk.co.ordnancesurvey.elevation.impl.SecondaryCacheProvider;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.util.MaxSizeHashMap;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.BngTools;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.EsriAsciiGrid;
 
-public class FileCacheInMemory implements NativeElevationProvider {
+public class FileCacheInMemory implements DataProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
 
@@ -53,7 +55,7 @@ public class FileCacheInMemory implements NativeElevationProvider {
     }
 
     @Override
-    public void setNext(NativeElevationProvider next) {
+    public void setNext(DataProvider next) {
         throw new UnsupportedOperationException("Lowest level - the buck stops here.");
     }
 

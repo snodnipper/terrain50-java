@@ -1,5 +1,7 @@
 package uk.co.ordnancesurvey.elevation;
 
+import uk.co.ordnancesurvey.elevation.impl.ElevationServiceImpl;
+
 public class ElevationServiceProvider {
 
     private volatile static ElevationService mInstance;
@@ -24,10 +26,14 @@ public class ElevationServiceProvider {
         if (mInstance == null) {
             synchronized (ElevationService.class) {
                 if (mInstance == null) {
-                    mInstance = new ElevationServiceImpl(configuration.getElevationProvider());
+                    mInstance = new ElevationServiceImpl(configuration.getTransformers(),
+                            configuration.getElevationProvider());
                 }
             }
         }
         return mInstance;
     }
+
+    // TODO look at picasso
+    // public static void clearCache() {}
 }

@@ -13,6 +13,7 @@ import uk.co.ordnancesurvey.api.appengine.AppEngineMemCacheProvider;
 import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
+import uk.co.ordnancesurvey.elevation.SpatialReference;
 
 public class ElevationServlet extends HttpServlet {
 
@@ -47,7 +48,8 @@ public class ElevationServlet extends HttpServlet {
                 && req.getParameterMap().containsKey("northing")) {
             String easting = req.getParameter("easting");
             String northing = req.getParameter("northing");
-            String elevation = sElevationService.getElevation(27700, easting, northing);
+            String elevation = sElevationService.getElevation(SpatialReference.EPSG_27700, easting,
+                    northing);
 
             String json = JsonDataV1.export(elevation);
             resp.setContentType("application/json");

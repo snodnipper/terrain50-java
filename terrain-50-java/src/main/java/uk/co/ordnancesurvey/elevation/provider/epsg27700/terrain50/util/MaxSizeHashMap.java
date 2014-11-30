@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl.util;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

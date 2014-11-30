@@ -5,8 +5,11 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
+import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.transformation.epsg27700.TransformerProj4js27700;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +26,19 @@ public class ElevationServiceImplTest {
         String easting = "402945";
         String northing = "249990";
         String expected = "101.8";
-        String actual = elevationService.getElevation(27700, easting, northing);
+        String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testElevationServiceWithProj4jsConfig() {
+        Configuration configuration = new Configuration.Builder().addTransformer(new TransformerProj4js27700()).build();
+        ElevationService elevationService = ElevationServiceProvider.getInstance(configuration);
+
+        String latitude = "51.50722";
+        String longitude = "-0.12750";
+        String expected = "7.3";
+        String actual = elevationService.getElevation(latitude, longitude);
         assertEquals(expected, actual);
     }
 
@@ -35,7 +50,7 @@ public class ElevationServiceImplTest {
         String easting = "530050";
         String northing = "180361";
         String expected = "7.3";
-        String actual = elevationService.getElevation(27700, easting, northing);
+        String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
         assertEquals(expected, actual);
 
         String latitude = "51.50722";
@@ -80,7 +95,7 @@ public class ElevationServiceImplTest {
                 String easting = "402945";
                 String northing = "249990";
                 String expected = "101.8";
-                String actual = elevationService.getElevation(27700, easting, northing);
+                String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
                 assertEquals(expected, actual);
                 atomicInteger.incrementAndGet();
             }

@@ -1,4 +1,4 @@
-package uk.co.ordnancesurvey.elevation.impl;
+package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
 
 import com.google.common.util.concurrent.Striped;
@@ -11,10 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.gis.BngTools;
-import uk.co.ordnancesurvey.gis.EsriAsciiGrid;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.BngTools;
+import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.EsriAsciiGrid;
+import uk.co.ordnancesurvey.elevation.provider.DataProvider;
 
-public class FileCache implements NativeElevationProvider {
+public class FileCache implements DataProvider {
 
     private static final Logger LOGGER = Logger.getLogger(FileCache.class.getName());
     private static final String CACHE_INTERNAL_NAME = "os-elevation-cache";
@@ -60,8 +61,8 @@ public class FileCache implements NativeElevationProvider {
     }
 
     @Override
-    public void setNext(NativeElevationProvider next) {
-
+    public void setNext(DataProvider next) {
+        throw new UnsupportedOperationException();
     }
 
     public static void setConcurrentDownloads(int concurrentDownloads) {
