@@ -14,7 +14,7 @@ public class TransformerProj4js27700 extends TransformerProj4js {
     private static final String SRID_DEFINITION = "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +datum=OSGB36 +units=m +no_defs";
 
     public TransformerProj4js27700() {
-        super("EPSG:27700", SRID_DEFINITION);
+        super(SRID, SRID_DEFINITION);
     }
 
     @Override
