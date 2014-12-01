@@ -15,6 +15,9 @@ public class ElevationServiceImpl implements ElevationService {
 
     private static final Logger LOGGER = Logger.getLogger(ElevationServiceImpl.class.getName());
 
+    private static final String DIFFERENT_SIZED_ARRAYS =
+            "latitude and longitude arrays differ in size!";
+
     private final Map<String, Transformer> mTransformers = new HashMap<String, Transformer>();
     private final Map<String, ElevationProvider> mElevationProviders
             = new HashMap<String, ElevationProvider>();
@@ -82,5 +85,32 @@ public class ElevationServiceImpl implements ElevationService {
 
         }
         return RESULT_UNKNOWN;
+    }
+
+    @Override
+    public String[] getElevationValues(String[] latitude, String[] longitude) {
+        if (latitude.length != longitude.length) {
+            throw new IllegalArgumentException(DIFFERENT_SIZED_ARRAYS);
+        }
+
+        String[] result = new String[latitude.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = getElevation(latitude[i], longitude[i]);
+        }
+        return result;
+    }
+
+
+    @Override
+    public String[] getElevationValues(double[] latitude, double[] longitude) {
+        if (latitude.length != longitude.length) {
+            throw new IllegalArgumentException(DIFFERENT_SIZED_ARRAYS);
+        }
+
+        String[] result = new String[latitude.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = getElevation(latitude[i], longitude[i]);
+        }
+        return result;
     }
 }

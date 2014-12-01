@@ -31,4 +31,11 @@ public interface ElevationService {
     String getElevation(String srid, String x, String y);
 
     String getElevation(String srid, double x, double y);
+
+    /**
+     * a convenience method to obtain elevation values for multiple inputs
+     */
+    String[] getElevationValues(String[] latitude, String[] longitude);
+
+    String[] getElevationValues(double[] latitude, double[] longitude);
 }

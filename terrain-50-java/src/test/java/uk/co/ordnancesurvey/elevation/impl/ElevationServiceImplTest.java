@@ -11,6 +11,7 @@ import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
 import uk.co.ordnancesurvey.elevation.SpatialReference;
 import uk.co.ordnancesurvey.elevation.transformation.epsg27700.TransformerProj4js27700;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class ElevationServiceImplTest {
@@ -109,6 +110,18 @@ public class ElevationServiceImplTest {
         checkLocationInBng("305674", "314915", "261.5");
         checkLocationInBng("503623", "504117", "-1.6");
         checkLocationInBng("305047", "697098", "127");
+    }
+
+    @Test
+    public void testSpotHeightsArray() {
+        String[] latitudes = new String[]{"57.4405369733", "60.6921160183", "50.7640788772"};
+        String[] longitudes = new String[]{"-1.81790913252", "-1.1066942536", "0.122657620389"};
+
+
+        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        String[] expected = new String[]{"41.8", "72.6", "43.5"};
+        String[] actual = elevationService.getElevationValues(latitudes, longitudes);
+        assertArrayEquals(expected, actual);
     }
 
     private void checkLocation(String latitude, String longitude, String elevation) {
