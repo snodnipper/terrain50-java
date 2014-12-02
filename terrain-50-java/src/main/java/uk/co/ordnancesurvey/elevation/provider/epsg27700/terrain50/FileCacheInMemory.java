@@ -49,7 +49,6 @@ public class FileCacheInMemory implements DataProvider {
             return EsriAsciiGrid.getValue(easting, northing, asciiGrid);
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "issues getting zipped elevation data", e);
-            e.printStackTrace();
         }
         return String.valueOf(Float.MIN_VALUE);
     }

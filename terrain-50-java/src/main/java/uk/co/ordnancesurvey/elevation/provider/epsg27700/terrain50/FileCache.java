@@ -1,11 +1,14 @@
 package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.util.concurrent.Striped;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +29,8 @@ public class FileCache implements DataProvider {
     private final NetworkManager mNetworkManager;
     private Striped<Lock> mStripedLock;
 
+    protected final Cache<String, String> mCache;
+
     public FileCache(NetworkManager networkManager) {
         mCacheDirectory = new File(System.getProperty("java.io.tmpdir") +
                 File.separator +
@@ -39,21 +44,34 @@ public class FileCache implements DataProvider {
 
         mNetworkManager = networkManager;
         mStripedLock = Striped.lazyWeakLock(sStripCount);
+
+        mCache = CacheBuilder.newBuilder().concurrencyLevel(4)
+                .maximumSize(2)
+                .expireAfterAccess(30, TimeUnit.SECONDS)
+                .build();
     }
 
     @Override
     public String getElevation(String easting, String northing) {
         String filePath = getFilename(easting, northing);
         try {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                download(file);
+            String asciiGrid = mCache.getIfPresent(filePath);
+            boolean isCached = asciiGrid != null;
+
+            if (!isCached) {
+                File file = new File(filePath);
+                if (!file.exists()) {
+                    download(file);
+                }
+                asciiGrid = EsriAsciiGrid.getAsciiGrid(file);
+                mCache.put(filePath, asciiGrid);
             }
-            String value = EsriAsciiGrid.getValue(easting, northing, file);
-            if (value.isEmpty()) {
+
+            String result = EsriAsciiGrid.getValue(easting, northing, asciiGrid);
+            if (result.isEmpty()) {
                 return ElevationService.RESULT_UNKNOWN;
             }
-            return value;
+            return result;
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "cannot get elevation from file", e);
         }
