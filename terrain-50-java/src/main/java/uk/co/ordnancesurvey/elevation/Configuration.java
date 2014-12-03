@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.ordnancesurvey.elevation.impl.CacheManager;
+import uk.co.ordnancesurvey.elevation.impl.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.ElevationProviderBng;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.FileCache;
@@ -17,24 +18,22 @@ import uk.co.ordnancesurvey.elevation.transformation.epsg27700.Transformer27700;
 
 public class Configuration {
 
-    private final int mConcurrentFileRequests;
     private final ElevationProvider mElevationProvider;
     private List<Transformer> mTransformers;
 
 
     private Configuration(Builder builder) {
-        mConcurrentFileRequests = builder.concurrentFileRequests;
         mElevationProvider = builder.elevationProvider;
         mTransformers = builder.transformers;
     }
 
     public static class Builder {
         private String terrain50DataUrl = "https://github.com/snodnipper/terrain50-java/raw/master/data/";
-        private int concurrentFileRequests = 10;
         private PrimaryCacheProvider primaryCacheProvider;
         private SecondaryCacheProvider secondaryCacheProvider;
         private ElevationProvider elevationProvider = null;
         private List<Transformer> transformers = new ArrayList<Transformer>();
+        private Strategy strategy = Strategy.CONSERVE_RESOURCE;
 
         /**
          * @param val a coordinate transformer from global (WGS84 SRID 4326) lat/lon coordinates to
@@ -45,16 +44,16 @@ public class Configuration {
             return this;
         }
 
-        public Builder concurrentFileRequests(int val) {
-            concurrentFileRequests = val;
-            return this;
-        }
-
         /**
          * @param val the key used to reference the level 1 lat/lon -> elevation map in app engine
          */
         public Builder setPrimaryCache(PrimaryCacheProvider val) {
             primaryCacheProvider = val;
+            return this;
+        }
+
+        public Builder setStrategy(Strategy val) {
+            strategy = val;
             return this;
         }
 
@@ -78,18 +77,18 @@ public class Configuration {
 
             boolean hasPrimaryCache = primaryCacheProvider != null;
             if (hasPrimaryCache) {
-                primaryDataProvider = new CacheManager(primaryCacheProvider);
+                primaryDataProvider = new CacheManager(strategy, primaryCacheProvider);
             } else {
-                primaryDataProvider = new CacheManager();
+                primaryDataProvider = new CacheManager(strategy);
             }
 
             boolean hasSecondaryCache = secondaryCacheProvider != null;
             NetworkManager networkManager = new NetworkManager(terrain50DataUrl);
             if (hasSecondaryCache) {
-                secondaryDataProvider = new FileCacheInMemory(networkManager,
+                secondaryDataProvider = new FileCacheInMemory(strategy, networkManager,
                         secondaryCacheProvider);
             } else {
-                secondaryDataProvider = new FileCache(networkManager);
+                secondaryDataProvider = new FileCache(strategy, networkManager);
             }
 
             primaryDataProvider.setNext(secondaryDataProvider);
@@ -108,9 +107,5 @@ public class Configuration {
 
     public ElevationProvider getElevationProvider() {
         return mElevationProvider;
-    }
-
-    public int getConcurrentFileRequests() {
-        return mConcurrentFileRequests;
     }
 }

@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
+import uk.co.ordnancesurvey.elevation.impl.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.BngTools;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.EsriAsciiGrid;
 import uk.co.ordnancesurvey.elevation.provider.DataProvider;
@@ -23,7 +24,7 @@ public class FileCache implements DataProvider {
     private static final Logger LOGGER = Logger.getLogger(FileCache.class.getName());
     private static final String CACHE_INTERNAL_NAME = "os-elevation-cache";
 
-    private static int sStripCount = 10;
+    private static int mStripCount;
 
     private final File mCacheDirectory;
     private final NetworkManager mNetworkManager;
@@ -31,7 +32,27 @@ public class FileCache implements DataProvider {
 
     protected final Cache<String, String> mCache;
 
-    public FileCache(NetworkManager networkManager) {
+    public FileCache(Strategy strategy, NetworkManager networkManager) {
+        final long cacheDuration;
+        final TimeUnit cacheTimeUnit;
+        final int cacheMaxSize;
+
+        switch (strategy) {
+            case CONSERVE_RESOURCE:
+                cacheDuration = 1;
+                cacheTimeUnit = TimeUnit.HOURS;
+                cacheMaxSize = 5;
+                mStripCount = 2;
+                break;
+            case MAX_PERFORMANCE:
+                cacheDuration = 14;
+                cacheTimeUnit = TimeUnit.HOURS;
+                cacheMaxSize = 50;
+                mStripCount = 100;
+                break;
+            default:
+                throw new IllegalStateException("unsupported strategy: "+ strategy);
+        }
         mCacheDirectory = new File(System.getProperty("java.io.tmpdir") +
                 File.separator +
                 CACHE_INTERNAL_NAME);
@@ -43,11 +64,11 @@ public class FileCache implements DataProvider {
         }
 
         mNetworkManager = networkManager;
-        mStripedLock = Striped.lazyWeakLock(sStripCount);
+        mStripedLock = Striped.lazyWeakLock(mStripCount);
 
         mCache = CacheBuilder.newBuilder().concurrencyLevel(4)
-                .maximumSize(2)
-                .expireAfterAccess(30, TimeUnit.SECONDS)
+                .maximumSize(cacheMaxSize)
+                .expireAfterAccess(cacheDuration, cacheTimeUnit)
                 .build();
     }
 
@@ -81,10 +102,6 @@ public class FileCache implements DataProvider {
     @Override
     public void setNext(DataProvider next) {
         throw new UnsupportedOperationException();
-    }
-
-    public static void setConcurrentDownloads(int concurrentDownloads) {
-        sStripCount = concurrentDownloads;
     }
 
     private void download(File file) throws IOException {

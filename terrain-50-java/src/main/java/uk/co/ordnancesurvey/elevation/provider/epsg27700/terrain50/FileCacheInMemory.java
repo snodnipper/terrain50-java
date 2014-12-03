@@ -1,17 +1,28 @@
 package uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.util.concurrent.Striped;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import uk.co.ordnancesurvey.elevation.impl.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.DataProvider;
 import uk.co.ordnancesurvey.elevation.impl.SecondaryCacheProvider;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.util.MaxSizeHashMap;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.BngTools;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.EsriAsciiGrid;
 
+/**
+ * Terrain 50 Zip Data Files are ~50KiB.  Thus we can store ~20 zipped files per MiB.  Assuming
+ * the container is allocating 128MiB for this operation can allocate ~200 files (~100MiB).
+ */
 public class FileCacheInMemory implements DataProvider {
 
     private static final int MAX_CACHE_SIZE = 100;
@@ -19,16 +30,47 @@ public class FileCacheInMemory implements DataProvider {
     private static final Logger LOGGER = Logger.getLogger(FileCacheInMemory.class.getName());
 
     private final NetworkManager mNetworkManager;
-    private final Map<String, byte[]> mZipFileCache;
+    private final Cache<String, byte[]> mZipFileCache;
+    private Striped<Lock> mStripedLock;
 
     /**
      * @param networkManager
      * @param secondaryCacheProvider
      */
-    public FileCacheInMemory(NetworkManager networkManager, SecondaryCacheProvider secondaryCacheProvider) {
+    public FileCacheInMemory(Strategy strategy, NetworkManager networkManager,
+                             SecondaryCacheProvider secondaryCacheProvider) {
+        int maxCacheSize;
+        int expiryHours;
+        // loosely define the no. of concurrent downloads
+        int stripCount;
+
+        switch (strategy) {
+            case CONSERVE_RESOURCE:
+                expiryHours = 1;
+                maxCacheSize = 20;
+                stripCount = 2;
+                break;
+            case MAX_PERFORMANCE:
+                expiryHours = 14;
+                maxCacheSize = 200;
+                stripCount = 100;
+                break;
+            default:
+                throw new IllegalArgumentException("");
+        }
+
         Map<String, byte[]> defaultCache = new MaxSizeHashMap<String, byte[]>(MAX_CACHE_SIZE);
-        mZipFileCache = secondaryCacheProvider.getSecondaryCache(defaultCache);
+
+        mZipFileCache = CacheBuilder.newBuilder().concurrencyLevel(4)
+                .expireAfterAccess(expiryHours, TimeUnit.HOURS)
+                .maximumSize(maxCacheSize)
+                .build();
+        mZipFileCache.asMap().putAll(secondaryCacheProvider
+                .getSecondaryCache(defaultCache));
+
         mNetworkManager = networkManager;
+
+        mStripedLock = Striped.lazyWeakLock(stripCount);
     }
 
     @Override
@@ -37,12 +79,19 @@ public class FileCacheInMemory implements DataProvider {
             // TODO: validate easting and northing values
             String filename = getFilename(easting, northing);
 
-            byte[] zippedData = mZipFileCache.get(filename);
+            byte[] zippedData = mZipFileCache.getIfPresent(filename);
 
             if (zippedData == null) {
                 File file = new File(filename);
-                zippedData = mNetworkManager.download(file);
-                mZipFileCache.put(filename, zippedData);
+
+                Lock lock = mStripedLock.get(file.getName());
+                lock.lock();
+                try {
+                    zippedData = mNetworkManager.download(file);
+                    mZipFileCache.put(filename, zippedData);
+                } finally {
+                    lock.unlock();
+                }
             }
 
             String asciiGrid = EsriAsciiGrid.getAsciiGrid(zippedData);
