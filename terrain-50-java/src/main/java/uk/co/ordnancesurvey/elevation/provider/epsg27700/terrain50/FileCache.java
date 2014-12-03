@@ -28,11 +28,16 @@ public class FileCache implements DataProvider {
 
     private final File mCacheDirectory;
     private final NetworkManager mNetworkManager;
+    private final String mTerrain50FilenameSuffix;
+
     private Striped<Lock> mStripedLock;
 
     protected final Cache<String, String> mCache;
 
-    public FileCache(Strategy strategy, NetworkManager networkManager) {
+    public FileCache(Strategy strategy, NetworkManager networkManager,
+                     String terrain50FilenameSuffix) {
+        mTerrain50FilenameSuffix = terrain50FilenameSuffix;
+
         final long cacheDuration;
         final TimeUnit cacheTimeUnit;
         final int cacheMaxSize;
@@ -127,7 +132,7 @@ public class FileCache implements DataProvider {
         String characters = gridRef.substring(0, 2).toLowerCase();
         String x = gridRef.substring(2, 3);
         String y = gridRef.substring(3, 4);
-        String name = characters + x + y +  "_OST50GRID_20130611";
+        String name = characters + x + y +  mTerrain50FilenameSuffix;
         return mCacheDirectory + File.separator + name + ".zip";
     }
 }

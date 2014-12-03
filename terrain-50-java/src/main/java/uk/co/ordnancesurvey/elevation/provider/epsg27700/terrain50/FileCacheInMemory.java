@@ -31,6 +31,7 @@ public class FileCacheInMemory implements DataProvider {
 
     private final NetworkManager mNetworkManager;
     private final Cache<String, byte[]> mZipFileCache;
+    private final String mTerrain50FilenameSuffix;
     private Striped<Lock> mStripedLock;
 
     /**
@@ -38,7 +39,11 @@ public class FileCacheInMemory implements DataProvider {
      * @param secondaryCacheProvider
      */
     public FileCacheInMemory(Strategy strategy, NetworkManager networkManager,
-                             SecondaryCacheProvider secondaryCacheProvider) {
+                             SecondaryCacheProvider secondaryCacheProvider,
+                             String terrain50FilenameSuffix) {
+        mNetworkManager = networkManager;
+        mTerrain50FilenameSuffix = terrain50FilenameSuffix;
+
         int maxCacheSize;
         int expiryHours;
         // loosely define the no. of concurrent downloads
@@ -67,8 +72,6 @@ public class FileCacheInMemory implements DataProvider {
                 .build();
         mZipFileCache.asMap().putAll(secondaryCacheProvider
                 .getSecondaryCache(defaultCache));
-
-        mNetworkManager = networkManager;
 
         mStripedLock = Striped.lazyWeakLock(stripCount);
     }
@@ -113,7 +116,7 @@ public class FileCacheInMemory implements DataProvider {
         String characters = gridRef.substring(0, 2).toLowerCase();
         String x = gridRef.substring(2, 3);
         String y = gridRef.substring(3, 4);
-        String name = characters + x + y +  "_OST50GRID_20130611";
+        String name = characters + x + y + mTerrain50FilenameSuffix;
         return name + ".zip";
     }
 }

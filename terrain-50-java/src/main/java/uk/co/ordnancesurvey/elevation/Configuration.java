@@ -34,6 +34,7 @@ public class Configuration {
         private ElevationProvider elevationProvider = null;
         private List<Transformer> transformers = new ArrayList<Transformer>();
         private Strategy strategy = Strategy.CONSERVE_RESOURCE;
+        private String terrain50FilenameSuffix = "_OST50GRID_20130611";
 
         /**
          * @param val a coordinate transformer from global (WGS84 SRID 4326) lat/lon coordinates to
@@ -71,6 +72,14 @@ public class Configuration {
             return this;
         }
 
+        /**
+         * @param suffix e.g. _OST50GRID_20130611 for a file data/hu/hu55_OST50GRID_20130611.zip
+         */
+        public Builder terrain50FileSuffix(String suffix) {
+            terrain50FilenameSuffix = suffix;
+            return this;
+        }
+
         public Configuration build() {
             DataProvider primaryDataProvider;
             DataProvider secondaryDataProvider;
@@ -86,9 +95,10 @@ public class Configuration {
             NetworkManager networkManager = new NetworkManager(terrain50DataUrl);
             if (hasSecondaryCache) {
                 secondaryDataProvider = new FileCacheInMemory(strategy, networkManager,
-                        secondaryCacheProvider);
+                        secondaryCacheProvider, terrain50FilenameSuffix);
             } else {
-                secondaryDataProvider = new FileCache(strategy, networkManager);
+                secondaryDataProvider = new FileCache(strategy, networkManager,
+                        terrain50FilenameSuffix);
             }
 
             primaryDataProvider.setNext(secondaryDataProvider);
