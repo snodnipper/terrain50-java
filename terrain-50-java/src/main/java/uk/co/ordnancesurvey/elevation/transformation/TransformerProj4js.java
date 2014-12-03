@@ -10,8 +10,6 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import hello.HelloTerrain50;
-
 public abstract class TransformerProj4js implements Transformer {
 
     private static final Logger LOGGER = Logger.getLogger(TransformerProj4js.class.getName());
@@ -75,8 +73,8 @@ public abstract class TransformerProj4js implements Transformer {
 
         try {
             BufferedReader br = new BufferedReader(
-                    new InputStreamReader(HelloTerrain50.class.getResourceAsStream("/proj4.js"),
-                            "UTF-8"));
+                    new InputStreamReader(TransformerProj4js
+                            .class.getResourceAsStream("/proj4.js"), "UTF-8"));
             for (int c = br.read(); c != -1; c = br.read()) sb.append((char)c);
         } catch (Exception lazy) {
             LOGGER.log(Level.SEVERE, "error reading proj4.js", lazy);
