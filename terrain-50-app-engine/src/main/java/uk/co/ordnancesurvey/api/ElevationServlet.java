@@ -14,6 +14,7 @@ import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
 import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.impl.Strategy;
 
 public class ElevationServlet extends HttpServlet {
 
@@ -23,7 +24,7 @@ public class ElevationServlet extends HttpServlet {
     static {
         AppEngineMemCacheProvider appEngineMemCacheProvider = new AppEngineMemCacheProvider();
         Configuration configuration = new Configuration.Builder()
-                .concurrentFileRequests(50)
+                .setStrategy(Strategy.MAX_PERFORMANCE)
                 .setPrimaryCache(appEngineMemCacheProvider)
                 .setSecondaryCache(appEngineMemCacheProvider)
                 .build();
