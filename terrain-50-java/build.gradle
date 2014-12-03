@@ -22,6 +22,11 @@ jar {
 }
 // end::jar[]
 
+compileJava {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+}
+
 // tag::dependencies[]
 dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
