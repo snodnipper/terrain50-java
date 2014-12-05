@@ -3,14 +3,12 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-mainClassName = 'hello.HelloTerrain50'
-version =  '0.1.0'
-//version =  '0.1.0-SNAPSHOT'
+//version =  '0.1.0'
+version =  '0.1.0-SNAPSHOT'
 group = 'uk.co.ordnancesurvey.api'
 
 // tag::repositories[]
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 // end::repositories[]
@@ -18,8 +16,6 @@ repositories {
 // tag::jar[]
 jar {
     baseName = 'elevation'
-    version =  '0.1.0'
-    //version =  '0.1.0-SNAPSHOT'
 }
 // end::jar[]
 
