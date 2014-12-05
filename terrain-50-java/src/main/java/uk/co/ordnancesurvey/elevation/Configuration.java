@@ -28,13 +28,13 @@ public class Configuration {
     }
 
     public static class Builder {
-        private String terrain50DataUrl = "https://github.com/snodnipper/terrain50-java/raw/master/data/";
+        private String terrain50DataUrl = "";
         private PrimaryCacheProvider primaryCacheProvider;
         private SecondaryCacheProvider secondaryCacheProvider;
         private ElevationProvider elevationProvider = null;
         private List<Transformer> transformers = new ArrayList<Transformer>();
         private Strategy strategy = Strategy.CONSERVE_RESOURCE;
-        private String terrain50FilenameSuffix = "_OST50GRID_20130611";
+        private String terrain50FilenameSuffix = "";
 
         /**
          * @param val a coordinate transformer from global (WGS84 SRID 4326) lat/lon coordinates to

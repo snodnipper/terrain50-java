@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
 import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.transformation.Transformer;
 import uk.co.ordnancesurvey.elevation.transformation.epsg27700.TransformerProj4js27700;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -23,7 +23,7 @@ public class ElevationServiceImplTest {
 
     @Test
     public void testElevationService() {
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
         String easting = "402945";
         String northing = "249990";
         String expected = "101.8";
@@ -33,8 +33,7 @@ public class ElevationServiceImplTest {
 
     @Test
     public void testElevationServiceWithProj4jsConfig() {
-        Configuration configuration = new Configuration.Builder().addTransformer(new TransformerProj4js27700()).build();
-        ElevationService elevationService = ElevationServiceProvider.getInstance(configuration);
+        ElevationService elevationService = getElevationService(new TransformerProj4js27700());
 
         String latitude = "51.50722";
         String longitude = "-0.12750";
@@ -46,7 +45,7 @@ public class ElevationServiceImplTest {
     @Test
     public void testLoad() {
         AtomicInteger counter = new AtomicInteger(0);
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
         run(counter, elevationService);
         run(counter, elevationService);
         run(counter, elevationService);
@@ -68,13 +67,14 @@ public class ElevationServiceImplTest {
 
     @Test
     public void testLondonElevation() {
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
 
         // London
         String easting = "530050";
         String northing = "180361";
         String expected = "7.3";
-        String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
+        String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting,
+                northing);
         assertEquals(expected, actual);
 
         String latitude = "51.50722";
@@ -117,25 +117,61 @@ public class ElevationServiceImplTest {
         String[] latitudes = new String[]{"57.4405369733", "60.6921160183", "50.7640788772"};
         String[] longitudes = new String[]{"-1.81790913252", "-1.1066942536", "0.122657620389"};
 
-
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
         String[] expected = new String[]{"41.8", "72.6", "43.5"};
         String[] actual = elevationService.getElevationValues(latitudes, longitudes);
         assertArrayEquals(expected, actual);
     }
 
+// # Crude Performance Test #
+//    @Test
+//    public void testCaches() {
+//        double easting = 402945;
+//        double northing = 249990;
+//        ElevationService elevationService = getElevationService();
+//
+//        long then = System.currentTimeMillis();
+//        for (int i = 0; i < 50000; i++) {
+//            easting++;
+//            northing++;
+//            String result = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
+//        }
+//        long now = System.currentTimeMillis();
+//        long totalTime = (now - then) / 1000;
+//        System.out.println("Total time: " + totalTime + " seconds");
+//    }
+
     private void checkLocation(String latitude, String longitude, String elevation) {
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
         String expected = elevation;
         String actual = elevationService.getElevation(latitude, longitude);
         assertEquals(expected, actual);
     }
 
     private void checkLocationInBng(String easting, String northing, String elevation) {
-        ElevationService elevationService = ElevationServiceProvider.getInstance();
+        ElevationService elevationService = getElevationService();
         String expected = elevation;
         String actual = elevationService.getElevation(SpatialReference.EPSG_27700, easting, northing);
         assertEquals(expected, actual);
+    }
+
+    private ElevationService getElevationService() {
+        return getElevationService(null);
+    }
+
+    // Note: cannot use singleton provider to test!
+    private ElevationService getElevationService(Transformer transformer) {
+        Configuration.Builder builder = new Configuration.Builder()
+                .setStrategy(Strategy.CONSERVE_RESOURCE)
+                .terrain50DataUrl("https://github.com/snodnipper/terrain50-java/raw/master/data/")
+                .terrain50FileSuffix("_OST50GRID_20130611");
+        if (transformer != null) {
+            builder.addTransformer(transformer);
+        }
+
+        Configuration configuration = builder.build();
+        return new ElevationServiceImpl(configuration.getTransformers(),
+                configuration.getElevationProvider());
     }
 
     private boolean isValid(long start, long timeout) {
