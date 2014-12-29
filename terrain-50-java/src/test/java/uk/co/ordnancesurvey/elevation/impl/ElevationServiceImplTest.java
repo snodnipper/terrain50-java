@@ -117,6 +117,7 @@ public class ElevationServiceImplTest {
         String[] latitudes = new String[]{"57.4405369733", "60.6921160183", "50.7640788772"};
         String[] longitudes = new String[]{"-1.81790913252", "-1.1066942536", "0.122657620389"};
 
+
         ElevationService elevationService = getElevationService();
         String[] expected = new String[]{"41.8", "72.6", "43.5"};
         String[] actual = elevationService.getElevationValues(latitudes, longitudes);
@@ -193,4 +194,3 @@ public class ElevationServiceImplTest {
         }).start();
     }
 }
-
