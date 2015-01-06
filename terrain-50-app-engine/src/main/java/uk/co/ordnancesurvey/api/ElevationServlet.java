@@ -27,6 +27,8 @@ public class ElevationServlet extends HttpServlet {
                 .setStrategy(Strategy.MAX_PERFORMANCE)
                 .setPrimaryCache(appEngineMemCacheProvider)
                 .setSecondaryCache(appEngineMemCacheProvider)
+                .terrain50DataUrl("https://github.com/snodnipper/terrain50-java/raw/master/data/")
+                .terrain50FileSuffix("_OST50GRID_20130611")
                 .build();
         sElevationService = ElevationServiceProvider.getInstance(configuration);
     }

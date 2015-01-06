@@ -5,6 +5,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceException;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,8 +80,18 @@ public class AppEngineMemCacheProvider implements PrimaryCacheProvider, Secondar
                 } catch (NullPointerException nullPointerException) {
                     LOGGER.log(Level.WARNING, "Cannot put value into memcache service " +
                             "(probably local execution)", nullPointerException);
+                } catch (IllegalArgumentException illegalArguementException) {
+                    LOGGER.log(Level.WARNING, "Cannot put value into memcache service " +
+                            "(probably local execution)", illegalArguementException);
                 }
             }
+
+            boolean hasProblemRestoring = memCacheMap == null;
+            if (hasProblemRestoring) {
+                LOGGER.log(Level.WARNING, "memcache issue: constructing empty cache");
+                memCacheMap = new HashMap<K, V>();
+            }
+
             return memCacheMap;
         }
     }
