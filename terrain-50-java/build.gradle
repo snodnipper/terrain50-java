@@ -60,6 +60,10 @@ uploadArchives {
             signing.signPom(deployment)
         }*/
 
+        // Ensure gradle works without properties defined
+        ext.mavenUser = project.hasProperty('mavenUser') ? project.getProperty('mavenUser') : 'unspecified'
+        ext.mavenPassword = project.hasProperty('mavenPassword') ? project.getProperty('mavenPassword') : 'unspecified'
+
         repository (url: "http://lv515:8081/nexus/content/repositories/releases") {
             authentication (userName: mavenUser, password: mavenPassword)
         }
