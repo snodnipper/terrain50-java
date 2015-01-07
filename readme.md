@@ -1,3 +1,8 @@
+# Online Demo #
+## London ##
+* http://os-elevation.appspot.com/elevation?latitude=51.50722&longitude=-0.12750
+* http://os-elevation.appspot.com/elevation?easting=530050&northing=180361
+
 # Code #
 include a gradle reference:
 
@@ -21,15 +26,6 @@ It is trivial to run independently.  Simply:
 * rename the files using the rename.py
 * upload the renamed files to a client accessable webserver (e.g. apache)
 * point clients to webserver endpoint via the .terrain50DataUrl(base_url) method
-
-# Online Demo #
-## London ##
-* http://os-elevation.appspot.com/elevation?latitude=51.50722&longitude=-0.12750
-* http://os-elevation.appspot.com/elevation?easting=530050&northing=180361
-
-## Ordnance Survey HQ ##
-* http://os-elevation.appspot.com/elevation?latitude=50.937947&longitude=-1.470624
-* http://os-elevation.appspot.com/elevation?easting=437293&northing=115522
 
 # Maintainer Repo Configuration #
 The maintainer should consider adding the following to their properties file:
