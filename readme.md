@@ -10,6 +10,8 @@ build the elevation service:
                 .terrain50FileSuffix("_OST50GRID_20130611")
                 .build();
         ElevationService elevationService = ElevationServiceProvider.getInstance(configuration);
+use it:
+
         double elevation = elevationService.getElevation(51.50722, -0.12750);
         double elevation2 = elevationService.getElevation(SpatialReference.EPSG_27700, 530050, 180361);
 
