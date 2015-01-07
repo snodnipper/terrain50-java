@@ -15,7 +15,6 @@ build the elevation service:
         Configuration configuration = new Configuration.Builder()
                 .setStrategy(Strategy.MAX_PERFORMANCE)
                 .terrain50DataUrl("https://github.com/snodnipper/terrain50-java/raw/master/data/")
-                .terrain50FileSuffix("_OST50GRID_20130611")
                 .build();
         ElevationService elevationService = ElevationServiceProvider.getInstance(configuration);
 use it:
