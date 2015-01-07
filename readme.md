@@ -3,6 +3,9 @@
 * http://os-elevation.appspot.com/elevation?latitude=51.50722&longitude=-0.12750
 * http://os-elevation.appspot.com/elevation?easting=530050&northing=180361
 
+## London, OS HQ, and Liverpool ##
+* http://os-elevation.appspot.com/elevation?locations=51.50722,-0.12750|50.937947,-1.470624|53.411836,-2.993172
+
 # Code #
 include a gradle reference:
 
