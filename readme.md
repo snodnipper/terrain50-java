@@ -15,6 +15,13 @@ use it:
         double elevation = elevationService.getElevation(51.50722, -0.12750);
         double elevation2 = elevationService.getElevation(SpatialReference.EPSG_27700, 530050, 180361);
 
+# Server #
+It is trivial to run independently.  Simply:
+* download [OS Terrain 50](https://www.ordnancesurvey.co.uk/opendatadownload/products.html)
+* rename the files using the rename.py
+* upload the renamed files to a client accessable webserver (e.g. apache)
+* point clients to webserver endpoint via the .terrain50DataUrl(base_url) method
+
 # Online Demo #
 ## London ##
 * http://os-elevation.appspot.com/elevation?latitude=51.50722&longitude=-0.12750
