@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
-import uk.co.ordnancesurvey.elevation.impl.Strategy;
+import uk.co.ordnancesurvey.elevation.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.BngTools;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.gis.EsriAsciiGrid;
 import uk.co.ordnancesurvey.elevation.provider.DataProvider;

@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import uk.co.ordnancesurvey.elevation.impl.Strategy;
+import uk.co.ordnancesurvey.elevation.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.DataProvider;
 import uk.co.ordnancesurvey.elevation.impl.SecondaryCacheProvider;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.util.MaxSizeHashMap;

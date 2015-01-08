@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.SpatialReference;
+import uk.co.ordnancesurvey.elevation.Strategy;
 import uk.co.ordnancesurvey.elevation.transformation.Transformer;
 import uk.co.ordnancesurvey.elevation.transformation.epsg27700.TransformerProj4js27700;
 

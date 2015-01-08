@@ -20,7 +20,7 @@ import uk.co.ordnancesurvey.elevation.Configuration;
 import uk.co.ordnancesurvey.elevation.ElevationService;
 import uk.co.ordnancesurvey.elevation.ElevationServiceProvider;
 import uk.co.ordnancesurvey.elevation.SpatialReference;
-import uk.co.ordnancesurvey.elevation.impl.Strategy;
+import uk.co.ordnancesurvey.elevation.Strategy;
 
 public class ElevationServlet extends HttpServlet {
 

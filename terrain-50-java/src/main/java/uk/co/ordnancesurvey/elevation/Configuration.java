@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.ordnancesurvey.elevation.impl.CacheManager;
-import uk.co.ordnancesurvey.elevation.impl.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.ElevationProvider;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.ElevationProviderBng;
 import uk.co.ordnancesurvey.elevation.provider.epsg27700.terrain50.FileCache;

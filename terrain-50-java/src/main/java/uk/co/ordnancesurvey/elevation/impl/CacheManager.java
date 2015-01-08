@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import java.util.concurrent.TimeUnit;
 
 import uk.co.ordnancesurvey.elevation.ElevationService;
+import uk.co.ordnancesurvey.elevation.Strategy;
 import uk.co.ordnancesurvey.elevation.provider.DataProvider;
 
 /**
