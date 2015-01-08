@@ -165,8 +165,7 @@ public class ElevationServiceImplTest {
     private ElevationService getElevationService(Transformer transformer) {
         Configuration.Builder builder = new Configuration.Builder()
                 .setStrategy(Strategy.CONSERVE_RESOURCE)
-                .terrain50DataUrl("https://github.com/snodnipper/terrain50-java/raw/master/data/")
-                .terrain50FileSuffix("_OST50GRID_20130611");
+                .terrain50DataUrl("https://github.com/snodnipper/terrain50-java/raw/master/data/");
         if (transformer != null) {
             builder.addTransformer(transformer);
         }
