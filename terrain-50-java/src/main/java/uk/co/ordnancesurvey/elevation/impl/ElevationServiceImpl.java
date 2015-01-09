@@ -28,9 +28,9 @@ public class ElevationServiceImpl implements ElevationService {
     public ElevationServiceImpl(List<Transformer> transformers, ElevationProvider... elevationProviders) {
         for (ElevationProvider elevationProvider : elevationProviders) {
             mElevationProviders.put(elevationProvider.getSpatialRefererence(), elevationProvider);
-            for (Transformer transformer : transformers) {
-                mTransformers.put(transformer.getSpatialReference(), transformer);
-            }
+        }
+        for (Transformer transformer : transformers) {
+            mTransformers.put(transformer.getSpatialReference(), transformer);
         }
     }
 
